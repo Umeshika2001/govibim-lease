@@ -1,0 +1,3612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="artifact-type" content="dashboard">
+<meta name="design-style" content="canopy">
+<title>GoviBim Lease — Smart Agricultural Land Leasing Platform (Sri Lanka)</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..600&family=Noto+Sans+Sinhala:wght@400;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  color-scheme: light;
+  --background: #faf6ef;
+  --surface-container-low: #f0eae0;
+  --surface-container: #e8e0d2;
+  --surface-container-high: #ddd3c2;
+  --surface-card: #fffdf9;
+  --on-surface: #2a302b;
+  --on-surface-variant: #4a524b;
+  --outline: #737872;
+  --outline-variant: #cbc5b8;
+  --primary: #2e7d32;
+  --primary-hover: #246427;
+  --on-primary: #ffffff;
+  --primary-container: #d8efe0;
+  --on-primary-container: #1b4b1e;
+  --secondary: #5c635c;
+  --tertiary: #8f5822;
+  --tertiary-container: #f2d4a7;
+  --on-tertiary-container: #6e3f0c;
+  --error: #b83230;
+  --on-error: #ffffff;
+  --error-container: #fbe8e7;
+  --positive: #2e7d32;
+  --warning: #c87414;
+  --warning-container: #fdf0db;
+  --on-warning-container: #7a4506;
+  --focus: #2e7d32;
+  --hero-scrim-start: rgb(18 46 21 / 0.88);
+  --hero-scrim-mid: rgb(22 56 26 / 0.68);
+  --hero-scrim-end: rgb(22 56 26 / 0.18);
+  --photo-pill-bg: rgb(20 32 21 / 0.76);
+  --badge-glass: rgb(255 253 249 / 0.94);
+  --modal-scrim: rgb(20 30 21 / 0.55);
+  --map-ocean-vec: #d7e6e4;
+  --map-ocean-sat: #173035;
+  --data-1: #2e7d32;
+  --data-2: #8f5822;
+  --data-3: #a85438;
+  --data-4: #4b6b78;
+  --data-context: #b5b0a3;
+  --font-headline: 'Noto Sans Sinhala', 'Literata', serif;
+  --font-body: 'Noto Sans Sinhala', 'Nunito Sans', sans-serif;
+  --font-label: 'Geist Mono', 'Noto Sans Sinhala', monospace;
+  --display-size: clamp(1.75rem, 1.35rem + 1.4vw, 2.45rem);
+  --headline-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+  --label-size: 0.75rem;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --rounded: 0.625rem;
+  --rounded-lg: 1rem;
+  --rounded-full: 9999px;
+  --shadow-soft: 0 4px 20px rgb(42 48 43 / 0.07);
+  --shadow-soft-hover: 0 10px 28px rgb(42 48 43 / 0.12);
+  --border-soft: 1px solid rgb(203 197 184 / 0.75);
+  --focus-glow: 0 0 0 3px rgb(46 125 50 / 0.28);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  overflow-x: clip;
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  line-height: 1.58;
+}
+header { position: static !important; }
+button, input, select, textarea { font-family: inherit; font-size: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.page-shell {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 var(--space-md) 5.5rem;
+}
+.page-shell * { min-width: 0; }
+
+/* Top Navigation Bar */
+.site-header {
+  background: var(--surface-card);
+  border-bottom: var(--border-soft);
+  padding: var(--space-sm) var(--space-md);
+}
+.header-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--rounded);
+  background: var(--primary);
+  color: var(--on-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.brand-title {
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--on-surface);
+  line-height: 1.2;
+}
+.brand-sub {
+  font-size: var(--label-size);
+  color: var(--on-surface-variant);
+}
+.header-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.role-switcher {
+  display: inline-flex;
+  background: var(--surface-container-low);
+  padding: var(--space-xs);
+  border-radius: var(--rounded);
+  gap: var(--space-xs);
+}
+.role-btn {
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  border: 0;
+  border-radius: calc(var(--rounded) - 2px);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color var(--dur-short) var(--ease-in-out), color var(--dur-short) var(--ease-in-out);
+}
+.role-btn[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.role-btn:hover:not([aria-pressed="true"]) {
+  background: var(--surface-container);
+  color: var(--on-surface);
+}
+.lang-toggle {
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  border-radius: var(--rounded);
+  border: var(--border-soft);
+  background: var(--surface-container-low);
+  color: var(--on-surface);
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.lang-toggle:hover { background: var(--surface-container); }
+
+/* Hero Section */
+.hero-banner {
+  position: relative;
+  border-radius: var(--rounded-lg);
+  overflow: hidden;
+  margin-top: var(--space-md);
+  min-height: 360px;
+  display: grid;
+  align-items: center;
+  box-shadow: var(--shadow-soft);
+  background: var(--primary-container);
+}
+.hero-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hero-overlay {
+  position: relative;
+  z-index: 2;
+  min-height: 360px;
+  padding: var(--space-xl) var(--space-lg);
+  background: linear-gradient(95deg, var(--hero-scrim-start) 0%, var(--hero-scrim-mid) 56%, var(--hero-scrim-end) 100%);
+  color: var(--on-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+.hero-kicker {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  padding: 4px 10px;
+  border-radius: var(--rounded-full);
+  font-weight: 600;
+}
+.hero-title {
+  font-family: var(--font-headline);
+  font-size: var(--display-size);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+  max-width: 18ch;
+  color: var(--on-primary);
+}
+.hero-desc {
+  margin: 0;
+  max-width: 54ch;
+  color: var(--primary-container);
+  font-size: 1rem;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+.hero-photo-note {
+  position: absolute;
+  right: var(--space-md);
+  bottom: var(--space-sm);
+  z-index: 3;
+  font-family: var(--font-label);
+  font-size: 0.6875rem;
+  background: var(--photo-pill-bg);
+  color: var(--on-primary);
+  padding: 3px 9px;
+  border-radius: var(--rounded-full);
+}
+
+/* Buttons */
+.btn {
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  border-radius: var(--rounded);
+  border: 0;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: background-color var(--dur-short) var(--ease-in-out), transform var(--dur-micro) var(--ease-out);
+}
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-primary { background: var(--primary); color: var(--on-primary); }
+.btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+.btn-secondary { background: var(--surface-container); color: var(--on-surface); }
+.btn-secondary:hover:not(:disabled) { background: var(--surface-container-high); }
+.btn-accent { background: var(--tertiary-container); color: var(--on-tertiary-container); }
+.btn-accent:hover:not(:disabled) { background: var(--surface-container-high); }
+.btn-danger { background: var(--error); color: var(--on-error); }
+.btn-sm { min-height: 44px; padding: 0 var(--space-md); font-size: 0.875rem; }
+
+/* Almanac Season Strip + Stats + How It Works */
+.season-strip {
+  margin-top: var(--space-md);
+  background: var(--surface-container-low);
+  border-radius: var(--rounded);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+.season-label {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  color: var(--on-surface-variant);
+  font-weight: 600;
+}
+.season-cells { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.season-cell {
+  font-family: var(--font-label);
+  font-size: 0.7rem;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: var(--surface-container-high);
+  color: var(--secondary);
+}
+.season-cell.is-yala {
+  background: var(--tertiary-container);
+  color: var(--on-tertiary-container);
+  font-weight: 700;
+}
+.season-cell.is-maha {
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+.stat-card {
+  background: var(--surface-container-low);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-md) var(--space-lg);
+}
+.stat-card.is-leaf-highlight {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+.stat-label {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+}
+.stat-card.is-leaf-highlight .stat-label { color: var(--on-primary-container); }
+.stat-value {
+  font-family: var(--font-headline);
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.stat-sub {
+  font-size: 0.8125rem;
+  color: var(--tertiary);
+  font-weight: 600;
+}
+.stat-card.is-leaf-highlight .stat-sub { color: var(--on-primary-container); }
+
+.how-section {
+  margin-top: var(--space-lg);
+}
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+.section-title {
+  font-family: var(--font-headline);
+  font-size: var(--headline-size);
+  font-weight: 700;
+  margin: 0;
+}
+.section-sub {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 0.9375rem;
+}
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: var(--space-md);
+}
+.step-card {
+  background: var(--surface-container-low);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-lg);
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+.step-num {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--rounded-full);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-label);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-card h3 { margin: 0 0 4px; font-size: 1.05rem; }
+.step-card p { margin: 0; font-size: 0.9rem; color: var(--on-surface-variant); }
+
+/* Farmer Workspace Layout */
+.workspace-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: var(--space-lg) 0 var(--space-md);
+  align-items: center;
+  justify-content: space-between;
+}
+.tab-group { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.tab-btn {
+  min-height: 44px;
+  padding: 0 var(--space-md);
+  border-radius: var(--rounded);
+  border: var(--border-soft);
+  background: var(--surface-card);
+  color: var(--on-surface);
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-btn[aria-selected="true"] {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  border-color: var(--primary);
+}
+.badge-count {
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  background: var(--primary);
+  color: var(--on-primary);
+  padding: 2px 7px;
+  border-radius: var(--rounded-full);
+}
+
+.explorer-grid {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+/* Filter Sidebar */
+.filter-panel {
+  background: var(--surface-card);
+  border: var(--border-soft);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.filter-header h3 { margin: 0; font-family: var(--font-headline); font-size: 1.125rem; }
+.field-group { display: flex; flex-direction: column; gap: 6px; }
+.field-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.field-value {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  color: var(--primary);
+  font-weight: 600;
+}
+.input-control, .select-control, .textarea-control {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: var(--rounded);
+  border: 1px solid var(--outline);
+  background: var(--background);
+  color: var(--on-surface);
+}
+.select-control { padding-right: 28px; }
+.textarea-control { min-height: 84px; resize: vertical; }
+.range-control { width: 100%; accent-color: var(--primary); min-height: 36px; cursor: pointer; }
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.check-row input { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
+
+/* Map Panel */
+.map-card {
+  background: var(--surface-card);
+  border: var(--border-soft);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-soft);
+  margin-bottom: var(--space-lg);
+}
+.map-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+.layer-toggle {
+  display: inline-flex;
+  background: var(--surface-container-low);
+  padding: 3px;
+  border-radius: var(--rounded);
+  gap: 4px;
+}
+.layer-btn {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: calc(var(--rounded) - 2px);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.layer-btn[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+#sl-map {
+  height: 430px;
+  min-height: 430px;
+  width: 100%;
+  border-radius: var(--rounded);
+  background: var(--map-ocean-vec);
+  z-index: 1;
+}
+#sl-map.is-satellite { background: var(--map-ocean-sat); }
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  font-size: 0.82rem;
+  color: var(--on-surface-variant);
+}
+.legend-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: var(--rounded-full);
+  display: inline-block;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+/* Listing Cards Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr));
+  gap: var(--space-lg);
+}
+.land-card {
+  background: var(--surface-card);
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out);
+  border: var(--border-soft);
+}
+.land-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft-hover);
+}
+.card-media {
+  position: relative;
+  height: 185px;
+  background: var(--surface-container);
+  overflow: hidden;
+}
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-pill {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  background: var(--photo-pill-bg);
+  color: var(--on-primary);
+  font-family: var(--font-label);
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: var(--rounded-full);
+}
+.match-ring-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--badge-glass);
+  border-radius: var(--rounded-full);
+  padding: 4px 8px 4px 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: var(--shadow-soft);
+  font-family: var(--font-label);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.match-ring-badge.score-high { color: var(--positive); }
+.match-ring-badge.score-mid { color: var(--warning); }
+.match-ring-badge.score-low { color: var(--error); }
+.fav-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--rounded-full);
+  border: 0;
+  background: var(--badge-glass);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-soft);
+}
+.fav-btn.is-fav { color: var(--error); }
+
+.card-body {
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex: 1;
+}
+.card-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.district-pill {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  background: var(--surface-container-low);
+  color: var(--on-surface-variant);
+  padding: 3px 9px;
+  border-radius: var(--rounded-full);
+  font-weight: 600;
+}
+.status-badge {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  padding: 3px 9px;
+  border-radius: var(--rounded-full);
+  font-weight: 700;
+}
+.status-approved, .status-accepted { background: var(--primary-container); color: var(--on-primary-container); }
+.status-pending { background: var(--warning-container); color: var(--on-warning-container); }
+.status-leased, .status-rejected { background: var(--error-container); color: var(--error); }
+
+.card-title {
+  margin: 0;
+  font-family: var(--font-headline);
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.card-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--on-surface-variant);
+}
+.spec-item { display: flex; align-items: center; gap: 5px; }
+.card-price {
+  font-family: var(--font-headline);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.card-price small { font-family: var(--font-body); font-size: 0.8rem; color: var(--on-surface-variant); font-weight: 600; }
+.card-actions {
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  border-top: var(--border-soft);
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  justify-content: space-between;
+}
+.compare-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 8px;
+  border-radius: var(--rounded);
+  background: var(--surface-container-low);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.compare-check input { width: 18px; height: 18px; accent-color: var(--primary); }
+
+/* Floating Compare Bar */
+.compare-tray {
+  position: fixed;
+  bottom: 4.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  background: var(--on-surface);
+  color: var(--on-primary);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-soft-hover);
+  display: none;
+  align-items: center;
+  gap: var(--space-md);
+  max-width: calc(100vw - 2rem);
+}
+.compare-tray.is-open { display: flex; flex-wrap: wrap; }
+
+/* Panels & Dashboards */
+.dashboard-panel {
+  background: var(--surface-card);
+  border: var(--border-soft);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-soft);
+  margin-top: var(--space-md);
+}
+.table-wrap { overflow-x: auto; margin-top: var(--space-md); }
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.data-table th {
+  text-align: left;
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  text-transform: uppercase;
+  background: var(--surface-container-low);
+  padding: 10px 12px;
+  border-bottom: var(--border-soft);
+}
+.data-table td {
+  padding: 12px;
+  border-bottom: var(--border-soft);
+  vertical-align: middle;
+}
+.thumb-sm {
+  width: 68px;
+  height: 46px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
+/* Multi-Step Add Land Wizard */
+.wizard-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+.wizard-pill {
+  padding: 10px 12px;
+  border-radius: var(--rounded);
+  background: var(--surface-container-low);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wizard-pill.is-active {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: var(--space-md);
+}
+#picker-map {
+  height: 320px;
+  min-height: 320px;
+  width: 100%;
+  border-radius: var(--rounded);
+  background: var(--map-ocean-vec);
+  margin-top: var(--space-sm);
+}
+.photo-upload-zone {
+  border: 2px dashed var(--outline);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-lg);
+  background: var(--surface-container-low);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+.preview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+.preview-item {
+  position: relative;
+  width: 132px;
+  height: 94px;
+  border-radius: var(--rounded);
+  overflow: hidden;
+  border: var(--border-soft);
+}
+.preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.preview-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--rounded-full);
+  border: 0;
+  background: var(--error);
+  color: var(--on-error);
+  font-weight: 700;
+  cursor: pointer;
+}
+.cover-tag {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+.chart-box {
+  background: var(--surface-container-low);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-md);
+}
+.chart-canvas-wrap {
+  position: relative;
+  min-height: 270px;
+  height: 270px;
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--modal-scrim);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+}
+.modal-backdrop.is-open { display: flex; }
+.modal-dialog {
+  background: var(--surface-card);
+  border-radius: var(--rounded-lg);
+  max-width: 860px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-soft-hover);
+}
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.modal-hero-img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: var(--rounded);
+  display: block;
+}
+.inline-alert {
+  padding: 10px 14px;
+  border-radius: var(--rounded);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: var(--space-sm);
+}
+.inline-alert.is-success { background: var(--primary-container); color: var(--on-primary-container); }
+.inline-alert.is-warn { background: var(--warning-container); color: var(--on-warning-container); }
+.inline-alert.is-error { background: var(--error-container); color: var(--error); }
+
+/* Compare Table Highlight */
+.best-cell {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  font-weight: 700;
+  border-radius: 6px;
+}
+
+/* Mobile Bottom Nav & Filter Sheet */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: var(--surface-card);
+  border-top: var(--border-soft);
+  padding: 6px var(--space-sm);
+  justify-content: space-around;
+}
+.mobile-nav-btn {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--on-surface-variant);
+  font-weight: 700;
+  font-size: 0.72rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+}
+.mobile-nav-btn.is-active { color: var(--primary); }
+.mobile-only-btn { display: none; }
+
+.site-footer {
+  margin-top: var(--space-2xl);
+  padding: var(--space-lg);
+  background: var(--surface-container-low);
+  border-radius: var(--rounded-lg);
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+}
+.footer-disclaimer {
+  margin: var(--space-xs) 0 0;
+  padding: var(--space-sm) var(--space-md);
+  border-left: 4px solid var(--tertiary);
+  background: var(--background);
+  border-radius: 0 var(--rounded) var(--rounded) 0;
+  color: var(--on-surface);
+  font-weight: 600;
+}
+
+.hidden-file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.is-hidden { display: none !important; }
+
+@media (max-width: 900px) {
+  .explorer-grid { grid-template-columns: 1fr; }
+  .filter-panel { display: none; }
+  .filter-panel.is-mobile-open {
+    display: flex;
+    position: fixed;
+    left: 0; right: 0; bottom: 56px;
+    z-index: 55;
+    max-height: 78vh;
+    overflow-y: auto;
+    border-radius: var(--rounded-lg) var(--rounded-lg) 0 0;
+  }
+  .mobile-only-btn { display: inline-flex; }
+}
+@media (max-width: 640px) {
+  .mobile-nav { display: flex; }
+  .hero-overlay { padding: var(--space-lg) var(--space-md); min-height: 300px; }
+  .wizard-steps { grid-template-columns: 1fr; }
+  .compare-tray { bottom: 4.4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"><i data-lucide="sprout"></i></div>
+      <div>
+        <div class="brand-title" data-i18n="brandTitle">GoviBim Lease</div>
+        <div class="brand-sub" data-i18n="brandSub">Smart Agricultural Land Leasing — Sri Lanka</div>
+      </div>
+    </div>
+    <div class="header-controls">
+      <div class="role-switcher" role="group" aria-label="Demo role switcher">
+        <button type="button" class="role-btn" id="role-btn-farmer" aria-pressed="true" onclick="switchRole('farmer')">
+          <i data-lucide="tractor" style="width:16px;height:16px"></i>
+          <span data-i18n="roleFarmer">Farmer</span>
+        </button>
+        <button type="button" class="role-btn" id="role-btn-owner" aria-pressed="false" onclick="switchRole('owner')">
+          <i data-lucide="map-pin" style="width:16px;height:16px"></i>
+          <span data-i18n="roleOwner">Landowner</span>
+        </button>
+        <button type="button" class="role-btn" id="role-btn-admin" aria-pressed="false" onclick="switchRole('admin')">
+          <i data-lucide="shield-check" style="width:16px;height:16px"></i>
+          <span data-i18n="roleAdmin">Admin</span>
+        </button>
+      </div>
+      <button type="button" class="lang-toggle" id="lang-toggle-btn" onclick="toggleLanguage()">
+        <i data-lucide="languages" style="width:16px;height:16px"></i>
+        <span id="lang-toggle-text">සිංහල</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="page-shell">
+  <!-- Hero Banner -->
+  <section class="hero-banner" id="hero-section">
+    <img id="hero-photo-el" class="hero-bg-img" alt="Lush green terraced paddy fields in Sri Lanka">
+    <div class="hero-overlay">
+      <span class="hero-kicker" data-i18n="heroKicker">GPS &amp; GIS Agricultural Discovery • 14 Districts</span>
+      <h1 class="hero-title" data-i18n="heroTitle">Find land for your next harvest</h1>
+      <p class="hero-desc" data-i18n="heroDesc">Compare verified paddy fields, highland tea estates, coconut groves, and irrigated vegetable plots across Sri Lanka with weighted match scoring and direct lease requests.</p>
+      <div class="hero-actions">
+        <button type="button" class="btn btn-primary" onclick="scrollToBrowse()">
+          <i data-lucide="search" style="width:18px;height:18px"></i>
+          <span data-i18n="browseLand">Browse land</span>
+        </button>
+        <button type="button" class="btn btn-accent" onclick="switchRole('owner')">
+          <i data-lucide="plus-circle" style="width:18px;height:18px"></i>
+          <span data-i18n="listYourLand">List your land</span>
+        </button>
+      </div>
+    </div>
+    <span class="hero-photo-note" data-i18n="illustrativePhoto">Illustrative photo</span>
+  </section>
+
+  <!-- Maha & Yala Seasonal Almanac Strip -->
+  <div class="season-strip" aria-label="Cultivation Seasons">
+    <span class="season-label" data-i18n="seasonStripLabel">Cultivation Calendar (Maha Oct–Mar • Yala Apr–Sep)</span>
+    <div class="season-cells" id="season-cells"></div>
+  </div>
+
+  <!-- Animated KPI Stats -->
+  <section class="stats-strip" aria-label="Platform Statistics">
+    <div class="stat-card is-leaf-highlight">
+      <div class="stat-label" data-i18n="statAcresLabel">Approved Acres</div>
+      <div class="stat-value" id="stat-acres">0</div>
+      <div class="stat-sub" data-i18n="statAcresSub">Ready for cultivation</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label" data-i18n="statDistrictsLabel">Active Districts</div>
+      <div class="stat-value" id="stat-districts">0</div>
+      <div class="stat-sub" data-i18n="statDistrictsSub">Islandwide GIS coverage</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label" data-i18n="statListingsLabel">Verified Plots</div>
+      <div class="stat-value" id="stat-listings">0</div>
+      <div class="stat-sub" data-i18n="statListingsSub">Checked by Admin</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label" data-i18n="statRequestsLabel">Lease Requests</div>
+      <div class="stat-value" id="stat-requests">0</div>
+      <div class="stat-sub" data-i18n="statRequestsSub">Direct owner replies</div>
+    </div>
+  </section>
+
+  <!-- 3-Step How It Works -->
+  <section class="how-section" id="how-section">
+    <div class="section-head">
+      <h2 class="section-title" data-i18n="howTitle">How GoviBim Lease works</h2>
+      <p class="section-sub" data-i18n="howSub">From discovery to harvest agreement in three steps</p>
+    </div>
+    <div class="steps-grid">
+      <article class="step-card">
+        <span class="step-num">1</span>
+        <div>
+          <h3 data-i18n="step1Title">Filter &amp; Match Score</h3>
+          <p data-i18n="step1Desc">Set district, acreage, budget, and water needs. Our weighted algorithm ranks the closest plots first.</p>
+        </div>
+      </article>
+      <article class="step-card">
+        <span class="step-num">2</span>
+        <div>
+          <h3 data-i18n="step2Title">Inspect GIS Map &amp; Compare</h3>
+          <p data-i18n="step2Desc">Explore parcels on the Sri Lanka vector map and compare up to 3 lands side by side.</p>
+        </div>
+      </article>
+      <article class="step-card">
+        <span class="step-num">3</span>
+        <div>
+          <h3 data-i18n="step3Title">Send Lease Request</h3>
+          <p data-i18n="step3Desc">Propose your crop and lease duration directly to the landowner and track approval live.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ==================== FARMER VIEW ==================== -->
+  <section id="view-farmer">
+    <div class="workspace-tabs" id="browse-anchor">
+      <div class="tab-group" role="tablist">
+        <button type="button" class="tab-btn" id="ftab-explore" aria-selected="true" onclick="setFarmerTab('explore')">
+          <i data-lucide="compass" style="width:16px;height:16px"></i>
+          <span data-i18n="tabExplore">Discover Lands</span>
+        </button>
+        <button type="button" class="tab-btn" id="ftab-requests" aria-selected="false" onclick="setFarmerTab('requests')">
+          <i data-lucide="file-text" style="width:16px;height:16px"></i>
+          <span data-i18n="tabMyRequests">My Lease Requests</span>
+          <span class="badge-count" id="farmer-req-count">0</span>
+        </button>
+        <button type="button" class="tab-btn" id="ftab-saved" aria-selected="false" onclick="setFarmerTab('saved')">
+          <i data-lucide="heart" style="width:16px;height:16px"></i>
+          <span data-i18n="tabSaved">Saved Lands</span>
+          <span class="badge-count" id="farmer-fav-count">0</span>
+        </button>
+      </div>
+      <div class="tab-group">
+        <button type="button" class="btn btn-secondary btn-sm mobile-only-btn" onclick="toggleMobileFilters()">
+          <i data-lucide="sliders-horizontal" style="width:16px;height:16px"></i>
+          <span data-i18n="filtersBtn">Filters</span>
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="view-mode-btn" onclick="toggleMapListFocus()">
+          <i data-lucide="map" style="width:16px;height:16px"></i>
+          <span id="view-mode-label" data-i18n="toggleMapOnly">Map Focus</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Explore Sub-view -->
+    <div id="farmer-explore-pane" class="explorer-grid">
+      <aside class="filter-panel" id="filter-panel" aria-label="Search Filters">
+        <div class="filter-header">
+          <h3 data-i18n="filterTitle">Match Preferences</h3>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="resetFilters()" data-i18n="resetFilters">Reset</button>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="f-district" data-i18n="lblDistrict">District</label>
+          <select id="f-district" class="select-control" onchange="applyFilters()"></select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="f-crop" data-i18n="lblCropType">Land / Crop Type</label>
+          <select id="f-crop" class="select-control" onchange="applyFilters()"></select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="f-size">
+            <span data-i18n="lblMinSize">Target Size (Acres)</span>
+            <span class="field-value" id="f-size-val">1.0+ ac</span>
+          </label>
+          <input type="range" id="f-size" class="range-control" min="0.5" max="8" step="0.5" value="1" oninput="updateSizeSlider(this.value)">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="f-price">
+            <span data-i18n="lblMaxRent">Max Monthly Rent</span>
+            <span class="field-value" id="f-price-val">LKR 90,000</span>
+          </label>
+          <input type="range" id="f-price" class="range-control" min="25000" max="100000" step="5000" value="90000" oninput="updatePriceSlider(this.value)">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="f-water" data-i18n="lblWater">Water Access</label>
+          <select id="f-water" class="select-control" onchange="applyFilters()"></select>
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" id="f-road" onchange="applyFilters()">
+          <span data-i18n="lblRoadAccess">Motorable Road Access</span>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" id="f-elec" onchange="applyFilters()">
+          <span data-i18n="lblElectricity">3-Phase / Grid Electricity</span>
+        </label>
+
+        <button type="button" class="btn btn-primary mobile-only-btn" onclick="toggleMobileFilters()" data-i18n="applyMobileBtn">Show Results</button>
+      </aside>
+
+      <div>
+        <!-- Map Panel -->
+        <div class="map-card" id="map-wrapper">
+          <div class="map-toolbar">
+            <div>
+              <strong data-i18n="mapHeading">Sri Lanka Agricultural GIS Map</strong>
+              <span class="district-pill" id="results-count-pill">0 lands</span>
+            </div>
+            <div class="layer-toggle" role="group" aria-label="Map layer mode">
+              <button type="button" class="layer-btn" id="layer-vec-btn" aria-pressed="true" onclick="setMapLayer('vector')" data-i18n="layerVector">Vector</button>
+              <button type="button" class="layer-btn" id="layer-sat-btn" aria-pressed="false" onclick="setMapLayer('satellite')" data-i18n="layerSatellite">Satellite</button>
+            </div>
+          </div>
+          <div id="sl-map"></div>
+          <div class="map-legend">
+            <span><span class="legend-dot" style="background: var(--positive)"></span><span data-i18n="legendHigh">80%+ High Match</span></span>
+            <span><span class="legend-dot" style="background: var(--warning)"></span><span data-i18n="legendMid">50–79% Moderate</span></span>
+            <span><span class="legend-dot" style="background: var(--error)"></span><span data-i18n="legendLow">&lt;50% Low / Leased</span></span>
+          </div>
+        </div>
+
+        <!-- Results Grid -->
+        <div id="listings-grid" class="cards-grid"></div>
+      </div>
+    </div>
+
+    <!-- Farmer Requests Sub-view -->
+    <div id="farmer-requests-pane" class="dashboard-panel is-hidden">
+      <div class="section-head">
+        <h3 class="section-title" data-i18n="myRequestsTitle">My Lease Requests</h3>
+        <p class="section-sub" data-i18n="myRequestsSub">Signed in as Demo Farmer: K.M. Ruwan Kumara</p>
+      </div>
+      <div id="farmer-requests-list" class="table-wrap"></div>
+    </div>
+
+    <!-- Farmer Saved Sub-view -->
+    <div id="farmer-saved-pane" class="dashboard-panel is-hidden">
+      <div class="section-head">
+        <h3 class="section-title" data-i18n="savedLandsTitle">Saved / Favorite Lands</h3>
+      </div>
+      <div id="farmer-saved-grid" class="cards-grid"></div>
+    </div>
+  </section>
+
+  <!-- ==================== LANDOWNER VIEW ==================== -->
+  <section id="view-owner" class="is-hidden">
+    <div class="workspace-tabs">
+      <div class="section-head" style="margin:0">
+        <h2 class="section-title" data-i18n="ownerDashTitle">Landowner Dashboard — Bandara Herath</h2>
+        <p class="section-sub" data-i18n="ownerDashSub">Manage your properties, publish new plots, and respond to lease requests.</p>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="openWizard()">
+        <i data-lucide="plus" style="width:18px;height:18px"></i>
+        <span data-i18n="addNewLandBtn">Add New Land</span>
+      </button>
+    </div>
+
+    <!-- Multi-Step Add Land Wizard -->
+    <div id="add-land-wizard" class="dashboard-panel is-hidden">
+      <div class="section-head">
+        <h3 class="section-title" data-i18n="wizardTitle">Publish Agricultural Land (3 Steps)</h3>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeWizard()" data-i18n="closeBtn">Close</button>
+      </div>
+
+      <div class="wizard-steps">
+        <div class="wizard-pill is-active" id="wstep-pill-1">1. <span data-i18n="wizStep1">Land Specs</span></div>
+        <div class="wizard-pill" id="wstep-pill-2">2. <span data-i18n="wizStep2">GPS / Map Pin</span></div>
+        <div class="wizard-pill" id="wstep-pill-3">3. <span data-i18n="wizStep3">Photos &amp; Submit</span></div>
+      </div>
+
+      <!-- Step 1 -->
+      <div id="wizard-step-1">
+        <div class="form-grid-2">
+          <div class="field-group">
+            <label class="field-label" for="w-title" data-i18n="lblLandTitle">Listing Title</label>
+            <input type="text" id="w-title" class="input-control" placeholder="e.g. Fertile Tank-Fed Paddy Field">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="w-district" data-i18n="lblDistrict">District</label>
+            <select id="w-district" class="select-control"></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="w-size" data-i18n="lblSize">Land Size</label>
+            <div style="display:flex;gap:8px">
+              <input type="number" id="w-size" class="input-control" min="1" step="0.25" value="3">
+              <select id="w-unit" class="select-control" style="max-width:130px">
+                <option value="acres" data-i18n="unitAcres">Acres</option>
+                <option value="perches" data-i18n="unitPerches">Perches</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="w-price" data-i18n="lblPriceLkr">Rent Price (LKR)</label>
+            <div style="display:flex;gap:8px">
+              <input type="number" id="w-price" class="input-control" min="5000" step="1000" value="45000">
+              <select id="w-cycle" class="select-control" style="max-width:135px">
+                <option value="monthly" data-i18n="cycleMonthly">Monthly</option>
+                <option value="annual" data-i18n="cycleAnnual">Annual</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="w-soil" data-i18n="lblSoil">Soil Type</label>
+            <select id="w-soil" class="select-control"></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="w-category" data-i18n="lblCropType">Primary Land Type</label>
+            <select id="w-category" class="select-control"></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="w-crops" data-i18n="lblSuitableCrops">Suitable Crops</label>
+            <input type="text" id="w-crops" class="input-control" placeholder="e.g. Samba Paddy, Maize, Mung Bean">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="w-water" data-i18n="lblWater">Water Access</label>
+            <select id="w-water" class="select-control"></select>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:12px">
+          <label class="check-row"><input type="checkbox" id="w-road" checked><span data-i18n="lblRoadAccess">Motorable Road Access</span></label>
+          <label class="check-row"><input type="checkbox" id="w-elec"><span data-i18n="lblElectricity">3-Phase / Grid Electricity</span></label>
+        </div>
+        <div id="wiz-err-1" class="inline-alert is-error is-hidden"></div>
+        <div style="margin-top:16px;display:flex;justify-content:flex-end">
+          <button type="button" class="btn btn-primary" onclick="goWizardStep(2)" data-i18n="nextStepBtn">Next: Location</button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="wizard-step-2" class="is-hidden">
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+          <button type="button" class="btn btn-primary" onclick="captureGPS()">
+            <i data-lucide="locate-fixed" style="width:18px;height:18px"></i>
+            <span data-i18n="useGpsBtn">Use My GPS Location</span>
+          </button>
+          <div class="field-value" id="w-coords-readout">7.8731° N, 80.7718° E</div>
+        </div>
+        <p class="section-sub" style="margin-top:8px" data-i18n="mapPickHint">Or click anywhere inside Sri Lanka on the map below to place your land pin:</p>
+        <div id="picker-map"></div>
+        <div id="wiz-gps-msg" class="inline-alert is-warn is-hidden"></div>
+        <div style="margin-top:16px;display:flex;justify-content:space-between">
+          <button type="button" class="btn btn-secondary" onclick="goWizardStep(1)" data-i18n="backBtn">Back</button>
+          <button type="button" class="btn btn-primary" onclick="goWizardStep(3)" data-i18n="nextPhotosBtn">Next: Photos</button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="wizard-step-3" class="is-hidden">
+        <div class="photo-upload-zone">
+          <strong data-i18n="uploadTitle">Upload Land Photographs (Compressed to max 800px JPEG)</strong>
+          <div style="display:flex;flex-wrap:wrap;gap:10px">
+            <label class="btn btn-primary" for="w-cam-input">
+              <i data-lucide="camera" style="width:18px;height:18px"></i>
+              <span data-i18n="cameraBtn">Take Photo (Camera)</span>
+            </label>
+            <input type="file" id="w-cam-input" class="hidden-file" accept="image/*" capture="environment" onchange="handlePhotoFiles(this.files)">
+
+            <label class="btn btn-secondary" for="w-gal-input">
+              <i data-lucide="image-plus" style="width:18px;height:18px"></i>
+              <span data-i18n="galleryBtn">Choose from Gallery</span>
+            </label>
+            <input type="file" id="w-gal-input" class="hidden-file" accept="image/*" multiple onchange="handlePhotoFiles(this.files)">
+          </div>
+          <div class="section-sub" id="upload-status-msg" data-i18n="uploadHint">First photo becomes the cover image. Leave empty to use a matched crop photo.</div>
+          <div class="preview-grid" id="w-photo-previews"></div>
+        </div>
+        <div style="margin-top:16px;display:flex;justify-content:space-between">
+          <button type="button" class="btn btn-secondary" onclick="goWizardStep(2)" data-i18n="backBtn">Back</button>
+          <button type="button" class="btn btn-primary" onclick="submitNewLand()" data-i18n="submitLandBtn">Submit for Admin Approval</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Owner's Lands -->
+    <div class="dashboard-panel">
+      <div class="section-head">
+        <h3 class="section-title" data-i18n="myLandsTitle">My Listed Properties</h3>
+      </div>
+      <div id="owner-lands-grid" class="cards-grid"></div>
+    </div>
+
+    <!-- Owner's Incoming Requests -->
+    <div class="dashboard-panel">
+      <div class="section-head">
+        <h3 class="section-title" data-i18n="incomingReqTitle">Incoming Lease Requests (My Properties Only)</h3>
+      </div>
+      <div id="owner-requests-list" class="table-wrap"></div>
+    </div>
+  </section>
+
+  <!-- ==================== ADMIN VIEW ==================== -->
+  <section id="view-admin" class="is-hidden">
+    <div class="workspace-tabs">
+      <div class="section-head" style="margin:0">
+        <h2 class="section-title" data-i18n="adminTitle">Administrator Console</h2>
+        <p class="section-sub" data-i18n="adminSub">Review pending listings, monitor district distribution, and audit lease activity.</p>
+      </div>
+      <button type="button" class="btn btn-danger btn-sm" id="reset-demo-btn" onclick="handleResetDemo(this)">
+        <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>
+        <span data-i18n="resetDemoBtn">Reset Demo Data</span>
+      </button>
+    </div>
+
+    <div class="stats-strip" id="admin-metrics"></div>
+
+    <!-- Pending Approvals -->
+    <div class="dashboard-panel">
+      <div class="section-head">
+        <h3 class="section-title" data-i18n="pendingQueueTitle">Pending Approval Queue</h3>
+      </div>
+      <div id="admin-pending-list" class="table-wrap"></div>
+    </div>
+
+    <!-- Chart.js Reports -->
+    <div class="dashboard-panel">
+      <div class="section-head">
+        <h3 class="section-title" data-i18n="reportsTitle">Platform Analytics Reports</h3>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-box">
+          <h4 style="margin:0 0 8px" data-i18n="chartDistrictTitle">Listings by District</h4>
+          <div class="chart-canvas-wrap"><canvas id="chart-districts"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <h4 style="margin:0 0 8px" data-i18n="chartRequestsTitle">Lease Request Status Breakdown</h4>
+          <div class="chart-canvas-wrap"><canvas id="chart-requests"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Listings Table -->
+    <div class="dashboard-panel">
+      <div class="section-head">
+        <h3 class="section-title" data-i18n="allListingsTitle">All Platform Listings</h3>
+      </div>
+      <div id="admin-all-table" class="table-wrap"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div><strong data-i18n="brandTitle">GoviBim Lease</strong> — <span data-i18n="footerCredit">GPS &amp; GIS Agricultural Land Discovery Prototype (Sri Lanka)</span></div>
+    <p class="footer-disclaimer" data-i18n="footerDisclaimer">Matching results are based on entered information and do not scientifically confirm soil quality or guarantee successful cultivation.</p>
+  </footer>
+</main>
+
+<!-- Floating Compare Tray -->
+<div class="compare-tray" id="compare-tray">
+  <span id="compare-tray-label">0 selected</span>
+  <button type="button" class="btn btn-primary btn-sm" onclick="openCompareModal()" data-i18n="compareNowBtn">Compare Side-by-Side</button>
+  <button type="button" class="btn btn-secondary btn-sm" onclick="clearCompare()" data-i18n="clearBtn">Clear</button>
+</div>
+
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <button type="button" class="mobile-nav-btn is-active" id="mnav-explore" onclick="mobileGo('explore')">
+    <i data-lucide="compass" style="width:18px;height:18px"></i>
+    <span data-i18n="mnavExplore">Explore</span>
+  </button>
+  <button type="button" class="mobile-nav-btn" id="mnav-requests" onclick="mobileGo('requests')">
+    <i data-lucide="file-text" style="width:18px;height:18px"></i>
+    <span data-i18n="mnavRequests">Requests</span>
+  </button>
+  <button type="button" class="mobile-nav-btn" id="mnav-owner" onclick="mobileGo('owner')">
+    <i data-lucide="plus-circle" style="width:18px;height:18px"></i>
+    <span data-i18n="mnavOwner">Owner</span>
+  </button>
+  <button type="button" class="mobile-nav-btn" id="mnav-admin" onclick="mobileGo('admin')">
+    <i data-lucide="shield-check" style="width:18px;height:18px"></i>
+    <span data-i18n="mnavAdmin">Admin</span>
+  </button>
+</nav>
+
+<!-- Details & Lease Request Modal -->
+<div class="modal-backdrop" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="modal-land-title">
+  <div class="modal-dialog">
+    <div class="modal-head">
+      <div>
+        <span class="district-pill" id="modal-district-pill"></span>
+        <h3 class="section-title" id="modal-land-title" style="margin-top:6px"></h3>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeDetailModal()" data-i18n="closeBtn">Close</button>
+    </div>
+    <div style="position:relative">
+      <img id="modal-photo" class="modal-hero-img" alt="Land parcel photograph">
+      <span class="photo-pill" data-i18n="illustrativePhoto">Illustrative photo</span>
+    </div>
+    <div id="modal-gallery-strip" class="preview-grid"></div>
+    <div id="modal-specs-grid" class="form-grid-2" style="margin-top:16px"></div>
+
+    <div id="modal-lease-box" class="dashboard-panel" style="background:var(--surface-container-low)">
+      <h4 style="margin:0 0 10px" data-i18n="sendLeaseTitle">Send Lease Request</h4>
+      <div class="form-grid-2">
+        <div class="field-group">
+          <label class="field-label" for="req-duration" data-i18n="lblDuration">Lease Duration</label>
+          <select id="req-duration" class="select-control">
+            <option value="6 Months (1 Season)">6 Months (1 Season)</option>
+            <option value="12 Months (Yala + Maha)">12 Months (Yala + Maha)</option>
+            <option value="24 Months (Multi-Year)">24 Months (Multi-Year)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="req-crop" data-i18n="lblPlannedCrop">Planned Crop</label>
+          <input type="text" id="req-crop" class="input-control" placeholder="e.g. Bg 352 Paddy">
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:10px">
+        <label class="field-label" for="req-note" data-i18n="lblFarmerNote">Message to Landowner</label>
+        <textarea id="req-note" class="textarea-control" placeholder="Introduce your farming experience and start date..."></textarea>
+      </div>
+      <div id="req-feedback" class="inline-alert is-hidden"></div>
+      <div style="margin-top:12px">
+        <button type="button" class="btn btn-primary" id="req-submit-btn" onclick="submitLeaseRequest()" data-i18n="submitRequestBtn">Submit Lease Request</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Compare Modal -->
+<div class="modal-backdrop" id="compare-modal" role="dialog" aria-modal="true" aria-labelledby="compare-modal-title">
+  <div class="modal-dialog" style="max-width:980px">
+    <div class="modal-head">
+      <h3 class="section-title" id="compare-modal-title" data-i18n="compareTitle">Side-by-Side Land Comparison</h3>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCompareModal()" data-i18n="closeBtn">Close</button>
+    </div>
+    <div id="compare-table-wrap" class="table-wrap"></div>
+  </div>
+</div>
+
+<api-shim></api-shim>
+
+<script>
+/* ================= BILINGUAL DICTIONARY (EN / SI) ================= */
+const I18N = {
+  en: {
+    brandTitle: `GoviBim Lease`,
+    brandSub: `Smart Agricultural Land Leasing — Sri Lanka`,
+    roleFarmer: `Farmer`,
+    roleOwner: `Landowner`,
+    roleAdmin: `Admin`,
+    heroKicker: `GPS & GIS Agricultural Discovery • 14 Districts`,
+    heroTitle: `Find land for your next harvest`,
+    heroDesc: `Compare verified paddy fields, highland tea estates, coconut groves, and irrigated vegetable plots across Sri Lanka with weighted match scoring and direct lease requests.`,
+    browseLand: `Browse land`,
+    listYourLand: `List your land`,
+    illustrativePhoto: `Illustrative photo`,
+    seasonStripLabel: `Cultivation Calendar (Maha Oct–Mar • Yala Apr–Sep)`,
+    statAcresLabel: `Approved Acres`,
+    statAcresSub: `Ready for cultivation`,
+    statDistrictsLabel: `Active Districts`,
+    statDistrictsSub: `Islandwide GIS coverage`,
+    statListingsLabel: `Verified Plots`,
+    statListingsSub: `Checked by Admin`,
+    statRequestsLabel: `Lease Requests`,
+    statRequestsSub: `Direct owner replies`,
+    howTitle: `How GoviBim Lease works`,
+    howSub: `From discovery to harvest agreement in three steps`,
+    step1Title: `Filter & Match Score`,
+    step1Desc: `Set district, acreage, budget, and water needs. Our weighted algorithm ranks the closest plots first.`,
+    step2Title: `Inspect GIS Map & Compare`,
+    step2Desc: `Explore parcels on the Sri Lanka vector map and compare up to 3 lands side by side.`,
+    step3Title: `Send Lease Request`,
+    step3Desc: `Propose your crop and lease duration directly to the landowner and track approval live.`,
+    tabExplore: `Discover Lands`,
+    tabMyRequests: `My Lease Requests`,
+    tabSaved: `Saved Lands`,
+    filtersBtn: `Filters`,
+    toggleMapOnly: `Map Focus`,
+    toggleGridFocus: `Show Map & List`,
+    filterTitle: `Match Preferences`,
+    resetFilters: `Reset`,
+    lblDistrict: `District`,
+    lblCropType: `Land / Crop Type`,
+    lblMinSize: `Target Size (Acres)`,
+    lblMaxRent: `Max Monthly Rent`,
+    lblWater: `Water Access`,
+    lblRoadAccess: `Motorable Road Access`,
+    lblElectricity: `3-Phase / Grid Electricity`,
+    applyMobileBtn: `Show Results`,
+    mapHeading: `Sri Lanka Agricultural GIS Map`,
+    layerVector: `Vector`,
+    layerSatellite: `Satellite`,
+    legendHigh: `80%+ High Match`,
+    legendMid: `50–79% Moderate`,
+    legendLow: `<50% Low / Leased`,
+    myRequestsTitle: `My Lease Requests`,
+    myRequestsSub: `Signed in as Demo Farmer: K.M. Ruwan Kumara`,
+    savedLandsTitle: `Saved / Favorite Lands`,
+    ownerDashTitle: `Landowner Dashboard — Bandara Herath`,
+    ownerDashSub: `Manage your properties, publish new plots, and respond to lease requests.`,
+    addNewLandBtn: `Add New Land`,
+    wizardTitle: `Publish Agricultural Land (3 Steps)`,
+    closeBtn: `Close`,
+    wizStep1: `Land Specs`,
+    wizStep2: `GPS / Map Pin`,
+    wizStep3: `Photos & Submit`,
+    lblLandTitle: `Listing Title`,
+    lblSize: `Land Size`,
+    unitAcres: `Acres`,
+    unitPerches: `Perches`,
+    lblPriceLkr: `Rent Price (LKR)`,
+    cycleMonthly: `Monthly`,
+    cycleAnnual: `Annual`,
+    lblSoil: `Soil Type`,
+    lblSuitableCrops: `Suitable Crops`,
+    nextStepBtn: `Next: Location`,
+    useGpsBtn: `Use My GPS Location`,
+    mapPickHint: `Or click anywhere inside Sri Lanka on the map below to place your land pin:`,
+    backBtn: `Back`,
+    nextPhotosBtn: `Next: Photos`,
+    uploadTitle: `Upload Land Photographs (Compressed to max 800px JPEG)`,
+    cameraBtn: `Take Photo (Camera)`,
+    galleryBtn: `Choose from Gallery`,
+    uploadHint: `First photo becomes the cover image. Leave empty to use a matched crop photo.`,
+    submitLandBtn: `Submit for Admin Approval`,
+    myLandsTitle: `My Listed Properties`,
+    incomingReqTitle: `Incoming Lease Requests (My Properties Only)`,
+    adminTitle: `Administrator Console`,
+    adminSub: `Review pending listings, monitor district distribution, and audit lease activity.`,
+    resetDemoBtn: `Reset Demo Data`,
+    pendingQueueTitle: `Pending Approval Queue`,
+    reportsTitle: `Platform Analytics Reports`,
+    chartDistrictTitle: `Listings by District`,
+    chartRequestsTitle: `Lease Request Status Breakdown`,
+    allListingsTitle: `All Platform Listings`,
+    footerCredit: `GPS & GIS Agricultural Land Discovery Prototype (Sri Lanka)`,
+    footerDisclaimer: `Matching results are based on entered information and do not scientifically confirm soil quality or guarantee successful cultivation.`,
+    compareNowBtn: `Compare Side-by-Side`,
+    clearBtn: `Clear`,
+    compareTitle: `Side-by-Side Land Comparison`,
+    sendLeaseTitle: `Send Lease Request`,
+    lblDuration: `Lease Duration`,
+    lblPlannedCrop: `Planned Crop`,
+    lblFarmerNote: `Message to Landowner`,
+    submitRequestBtn: `Submit Lease Request`,
+    mnavExplore: `Explore`,
+    mnavRequests: `Requests`,
+    mnavOwner: `Owner`,
+    mnavAdmin: `Admin`,
+    allDistricts: `All Districts`,
+    allTypes: `All Crop Types`,
+    anyWater: `Any Water Source`,
+    viewDetails: `Details & Request`,
+    compareLabel: `Compare`,
+    matchLabel: `Match`,
+    leasedTag: `Leased`,
+    approvedTag: `Available`,
+    pendingTag: `Pending Approval`,
+    acceptedTag: `Accepted`,
+    rejectedTag: `Rejected`,
+    acceptBtn: `Accept`,
+    rejectBtn: `Reject`,
+    approveBtn: `Approve`,
+    removeBtn: `Remove`,
+    confirmAgain: `Click again to confirm`,
+    noResults: `No approved lands match your strict filters. Try widening the rent or district filter.`,
+    noRequests: `No lease requests yet. Open any available land card to submit a request.`,
+    noSaved: `No saved lands yet. Tap the heart icon on any land card to save it.`,
+    noPending: `All submitted listings have been reviewed.`,
+    leasedDisabledMsg: `This property is already leased. New lease requests are disabled.`,
+    reqSentMsg: `Lease request sent! Track its live status under "My Lease Requests".`,
+    reqMissingMsg: `Please enter your planned crop before submitting.`,
+    acresShort: `ac`,
+    perMonth: `/ month`,
+    roadShort: `Road`,
+    trackShort: `Track`,
+    elecShort: `+ Elec`,
+    colPhoto: `Photo`,
+    colLand: `Land`,
+    colDistrict: `District`,
+    colCropDuration: `Crop & Duration`,
+    colStatus: `Status`,
+    colAction: `Action`,
+    colFarmer: `Farmer`,
+    colOwner: `Owner`,
+    colSizeRent: `Size & Rent`,
+    colRent: `Rent`,
+    attrShort: `Attribute`,
+    admOwners: `Registered Owners`,
+    admOwnersSub: `Verified demo accounts`,
+    admFarmers: `Active Farmers`,
+    admFarmersSub: `Seeking cultivation land`,
+    admPending: `Pending Approvals`,
+    admPendingSub: `Awaiting review`,
+    admLive: `Approved / Leased`,
+    admLiveSub: `Live marketplace`,
+    waterNames: { tank: `Tank Irrigation`, canal: `Canal`, well: `Agro Well`, none: `Rainfed` },
+    catNames: { paddy: `Paddy`, tea: `Tea Estate`, coconut: `Coconut`, vegetable: `Vegetable` },
+    soilNames: {
+      alluvial: `Alluvial Clay`,
+      redyellow: `Red-Yellow Podzolic`,
+      reddish: `Reddish Brown Earth`,
+      sandy: `Sandy Loam`,
+      latosolic: `Calcic Red Latosol`
+    }
+  },
+  si: {
+    brandTitle: `ගොවිබිම් ලීස්`,
+    brandSub: `ස්මාර්ට් කෘෂිකාර්මික ඉඩම් බදු වේදිකාව — ශ්‍රී ලංකාව`,
+    roleFarmer: `ගොවියා`,
+    roleOwner: `ඉඩම් හිමියා`,
+    roleAdmin: `පරිපාලක`,
+    heroKicker: `GPS සහ GIS ඉඩම් සෙවීම • දිස්ත්‍රික්ක 14`,
+    heroTitle: `ඔබගේ ඊළඟ අස්වැන්න සඳහා ඉඩම් සොයාගන්න`,
+    heroDesc: `ශ්‍රී ලංකාව පුරා තහවුරු කළ කුඹුරු, තේ වතු, පොල් ඉඩම් සහ වාරි එළවළු බිම් ගැලපුම් ලකුණු සහ සෘජු බදු ඉල්ලීම් සමඟ සසඳන්න.`,
+    browseLand: `ඉඩම් සොයන්න`,
+    listYourLand: `ඔබගේ ඉඩම එක් කරන්න`,
+    illustrativePhoto: `නිදර්ශන ඡායාරූපය`,
+    seasonStripLabel: `වගා කාලසටහන (මහ ඔක්–මාර් • යල අප්‍රේල්–සැප්)`,
+    statAcresLabel: `අනුමත අක්කර`,
+    statAcresSub: `වගාවට සූදානම්`,
+    statDistrictsLabel: `සක්‍රිය දිස්ත්‍රික්ක`,
+    statDistrictsSub: `දිවයින පුරා GIS ආවරණය`,
+    statListingsLabel: `තහවුරු කළ ඉඩම්`,
+    statListingsSub: `පරිපාලක පරීක්ෂාවෙන්`,
+    statRequestsLabel: `බදු ඉල්ලීම්`,
+    statRequestsSub: `සෘජු හිමිකරු ප්‍රතිචාර`,
+    howTitle: `ගොවිබිම් ලීස් ක්‍රියාත්මක වන ආකාරය`,
+    howSub: `සෙවීමේ සිට වගා ගිවිසුම දක්වා පියවර තුනකින්`,
+    step1Title: `පෙරීම සහ ගැලපුම් ලකුණු`,
+    step1Desc: `දිස්ත්‍රික්කය, අක්කර ප්‍රමාණය, මිල සහ ජල පහසුකම් තෝරන්න. වඩාත් ගැලපෙන ඉඩම් මුලින් පෙන්වයි.`,
+    step2Title: `GIS සිතියම සහ සැසඳීම`,
+    step2Desc: `ශ්‍රී ලංකා සිතියම මත ඉඩම් බලා ඉඩම් 3ක් දක්වා එකවර සංසන්දනය කරන්න.`,
+    step3Title: `බදු ඉල්ලීම යැවීම`,
+    step3Desc: `ඔබගේ වගාව සහ බදු කාලය ඉඩම් හිමියා වෙත යවා අනුමැතිය සජීවීව බලන්න.`,
+    tabExplore: `ඉඩම් සොයන්න`,
+    tabMyRequests: `මගේ බදු ඉල්ලීම්`,
+    tabSaved: `සුරැකි ඉඩම්`,
+    filtersBtn: `පෙරහන්`,
+    toggleMapOnly: `සිතියම පමණි`,
+    toggleGridFocus: `සිතියම සහ ලැයිස්තුව`,
+    filterTitle: `ගැලපුම් මනාපයන්`,
+    resetFilters: `යළි සකසන්න`,
+    lblDistrict: `දිස්ත්‍රික්කය`,
+    lblCropType: `ඉඩම් / වගා වර්ගය`,
+    lblMinSize: `අවශ්‍ය ප්‍රමාණය (අක්කර)`,
+    lblMaxRent: `උපරිම මාසික බදු කුලිය`,
+    lblWater: `ජල පහසුකම්`,
+    lblRoadAccess: `වාහන ප්‍රවේශ මාර්ග`,
+    lblElectricity: `විදුලි බල පහසුකම්`,
+    applyMobileBtn: `ප්‍රතිඵල පෙන්වන්න`,
+    mapHeading: `ශ්‍රී ලංකා කෘෂිකාර්මික GIS සිතියම`,
+    layerVector: `වෙක්ටර්`,
+    layerSatellite: `සැටලයිට්`,
+    legendHigh: `80%+ ඉහළ ගැලපීම`,
+    legendMid: `50–79% මධ්‍යම`,
+    legendLow: `<50% අඩු / බදු දී ඇත`,
+    myRequestsTitle: `මගේ බදු ඉල්ලීම්`,
+    myRequestsSub: `ආදර්ශ ගොවියා: කේ.එම්. රුවන් කුමාර`,
+    savedLandsTitle: `සුරැකි / ප්‍රියතම ඉඩම්`,
+    ownerDashTitle: `ඉඩම් හිමිකරු පුවරුව — බණ්ඩාර හේරත්`,
+    ownerDashSub: `ඔබගේ ඉඩම් කළමනාකරණය කර, නව ඉඩම් එක් කර, බදු ඉල්ලීම් වලට පිළිතුරු දෙන්න.`,
+    addNewLandBtn: `නව ඉඩමක් එක් කරන්න`,
+    wizardTitle: `නව කෘෂිකාර්මික ඉඩමක් පළ කරන්න (පියවර 3)`,
+    closeBtn: `වසන්න`,
+    wizStep1: `ඉඩම් විස්තර`,
+    wizStep2: `GPS / සිතියම් ස්ථානය`,
+    wizStep3: `ඡායාරූප සහ යැවීම`,
+    lblLandTitle: `ඉඩමේ මාතෘකාව`,
+    lblSize: `ඉඩමේ ප්‍රමාණය`,
+    unitAcres: `අක්කර`,
+    unitPerches: `පර්චස්`,
+    lblPriceLkr: `බදු මුදල (රු.)`,
+    cycleMonthly: `මාසික`,
+    cycleAnnual: `වාර්ෂික`,
+    lblSoil: `පසෙහි වර්ගය`,
+    lblSuitableCrops: `සුදුසු භෝග`,
+    nextStepBtn: `ඊළඟ: ස්ථානය`,
+    useGpsBtn: `මගේ GPS ස්ථානය ගන්න`,
+    mapPickHint: `නැතහොත් පහත සිතියම මත ක්ලික් කර ඉඩමේ ස්ථානය සලකුණු කරන්න:`,
+    backBtn: `ආපසු`,
+    nextPhotosBtn: `ඊළඟ: ඡායාරූප`,
+    uploadTitle: `ඉඩම් ඡායාරූප උඩුගත කරන්න (800px JPEG බවට සංකෝචනය වේ)`,
+    cameraBtn: `කැමරාවෙන් ගන්න`,
+    galleryBtn: `ගැලරියෙන් තෝරන්න`,
+    uploadHint: `පළමු ඡායාරූපය ප්‍රධාන පින්තූරය වේ. හිස්ව තැබුවහොත් ගැලපෙන භෝග ඡායාරූපයක් භාවිතා වේ.`,
+    submitLandBtn: `පරිපාලක අනුමැතියට යවන්න`,
+    myLandsTitle: `මගේ ලැයිස්තුගත ඉඩම්`,
+    incomingReqTitle: `ලැබී ඇති බදු ඉල්ලීම් (මගේ ඉඩම් සඳහා පමණි)`,
+    adminTitle: `පරිපාලක පුවරුව`,
+    adminSub: `අනුමැතියට ඇති ඉඩම් පරීක්ෂා කර, දිස්ත්‍රික් ව්‍යාප්තිය සහ බදු වාර්තා බලන්න.`,
+    resetDemoBtn: `ආදර්ශ දත්ත යළි සකසන්න`,
+    pendingQueueTitle: `අනුමැතිය බලාපොරොත්තු වන ඉඩම්`,
+    reportsTitle: `වේදිකා විශ්ලේෂණ වාර්තා`,
+    chartDistrictTitle: `දිස්ත්‍රික්ක අනුව ඉඩම්`,
+    chartRequestsTitle: `බදු ඉල්ලීම් තත්ත්ව විශ්ලේෂණය`,
+    allListingsTitle: `සියලුම වේදිකා ඉඩම්`,
+    footerCredit: `GPS සහ GIS කෘෂිකාර්මික ඉඩම් සොයාගැනීමේ ආදර්ශය (ශ්‍රී ලංකාව)`,
+    footerDisclaimer: `ගැලපීම් ප්‍රතිඵල ඇතුළත් කළ තොරතුරු මත පදනම් වන අතර පසෙහි ගුණාත්මකභාවය විද්‍යාත්මකව තහවුරු කිරීමක් හෝ සාර්ථක වගාවක් සහතික කිරීමක් නොකරයි.`,
+    compareNowBtn: `සංසන්දනය කරන්න`,
+    clearBtn: `මකන්න`,
+    compareTitle: `ඉඩම් පැත්තෙන් පැත්ත සංසන්දනය`,
+    sendLeaseTitle: `බදු ඉල්ලීම යවන්න`,
+    lblDuration: `බදු කාලසීමාව`,
+    lblPlannedCrop: `වගා කිරීමට අපේක්ෂිත භෝගය`,
+    lblFarmerNote: `ඉඩම් හිමියාට පණිවිඩය`,
+    submitRequestBtn: `බදු ඉල්ලීම යවන්න`,
+    mnavExplore: `සොයන්න`,
+    mnavRequests: `ඉල්ලීම්`,
+    mnavOwner: `හිමිකරු`,
+    mnavAdmin: `පරිපාලක`,
+    allDistricts: `සියලුම දිස්ත්‍රික්ක`,
+    allTypes: `සියලුම වගා වර්ග`,
+    anyWater: `ඕනෑම ජල මූලාශ්‍රයක්`,
+    viewDetails: `විස්තර සහ ඉල්ලීම`,
+    compareLabel: `සසඳන්න`,
+    matchLabel: `ගැලපීම`,
+    leasedTag: `බදු දී ඇත`,
+    approvedTag: `ලබා ගත හැක`,
+    pendingTag: `අනුමැතියට ඇත`,
+    acceptedTag: `පිළිගත්තා`,
+    rejectedTag: `ප්‍රතික්ෂේප කළා`,
+    acceptBtn: `පිළිගන්න`,
+    rejectBtn: `ප්‍රතික්ෂේප කරන්න`,
+    approveBtn: `අනුමත කරන්න`,
+    removeBtn: `ඉවත් කරන්න`,
+    confirmAgain: `තහවුරු කිරීමට නැවත ඔබන්න`,
+    noResults: `ඔබගේ පෙරහන් වලට ගැලපෙන ඉඩම් නොමැත. මිල හෝ දිස්ත්‍රික් පෙරහන ලිහිල් කරන්න.`,
+    noRequests: `තවම බදු ඉල්ලීම් නොමැත. ඕනෑම ඉඩම් කාඩ්පතක් විවෘත කර ඉල්ලීමක් යවන්න.`,
+    noSaved: `සුරැකි ඉඩම් නොමැත. සුරැකීමට හදවත අයිකනය ඔබන්න.`,
+    noPending: `සියලුම ඉඩම් පරීක්ෂා කර ඇත.`,
+    leasedDisabledMsg: `මෙම ඉඩම දැනටමත් බදු දී ඇත. නව ඉල්ලීම් යැවිය නොහැක.`,
+    reqSentMsg: `බදු ඉල්ලීම යවන ලදී! "මගේ බදු ඉල්ලීම්" යටතේ තත්ත්වය බලන්න.`,
+    reqMissingMsg: `කරුණාකර වගා කිරීමට අපේක්ෂිත භෝගය ඇතුළත් කරන්න.`,
+    acresShort: `අක්කර`,
+    perMonth: `/ මසකට`,
+    roadShort: `මාර්ග`,
+    trackShort: `අඩිපාර`,
+    elecShort: `+ විදුලිය`,
+    colPhoto: `ඡායාරූපය`,
+    colLand: `ඉඩම`,
+    colDistrict: `දිස්ත්‍රික්කය`,
+    colCropDuration: `භෝගය සහ කාලය`,
+    colStatus: `තත්ත්වය`,
+    colAction: `ක්‍රියාව`,
+    colFarmer: `ගොවියා`,
+    colOwner: `හිමිකරු`,
+    colSizeRent: `ප්‍රමාණය සහ කුලිය`,
+    colRent: `බදු කුලිය`,
+    attrShort: `ලක්ෂණය`,
+    admOwners: `ලියාපදිංචි හිමිකරුවන්`,
+    admOwnersSub: `තහවුරු කළ ගිණුම්`,
+    admFarmers: `සක්‍රිය ගොවීන්`,
+    admFarmersSub: `වගා ඉඩම් සොයන්නන්`,
+    admPending: `අනුමැතියට ඇති`,
+    admPendingSub: `පරීක්ෂාව බලාපොරොත්තුවෙන්`,
+    admLive: `අනුමත / බදු දුන්`,
+    admLiveSub: `සක්‍රිය වෙළඳපොළ`,
+    waterNames: { tank: `වැව් ජලය`, canal: `ඇළ මාර්ග`, well: `වගා ළිඳ`, none: `වැසි ජලය` },
+    catNames: { paddy: `කුඹුරු (වී)`, tea: `තේ වත්ත`, coconut: `පොල් ඉඩම`, vegetable: `එළවළු බිම` },
+    soilNames: {
+      alluvial: `දියළු මැටි පස`,
+      redyellow: `රතු-කහ පොඩ්සොලික්`,
+      reddish: `රතු දුඹුරු පස`,
+      sandy: `වැලි ලෝම් පස`,
+      latosolic: `රතු ලැටසෝල් පස`
+    }
+  }
+};
+
+const DISTRICTS = [
+  { id: `Anuradhapura`, si: `අනුරාධපුර`, lat: 8.3114, lng: 80.4037 },
+  { id: `Polonnaruwa`, si: `පොළොන්නරුව`, lat: 7.9403, lng: 81.0188 },
+  { id: `Kurunegala`, si: `කුරුණෑගල`, lat: 7.4863, lng: 80.3647 },
+  { id: `Ampara`, si: `අම්පාර`, lat: 7.2975, lng: 81.6722 },
+  { id: `Matale`, si: `මාතලේ`, lat: 7.4675, lng: 80.6234 },
+  { id: `Hambantota`, si: `හම්බන්තොට`, lat: 6.1246, lng: 81.1185 },
+  { id: `Badulla`, si: `බදුල්ල`, lat: 6.9934, lng: 81.055 },
+  { id: `Gampaha`, si: `ගම්පහ`, lat: 7.0873, lng: 79.999 },
+  { id: `Nuwara Eliya`, si: `නුවරඑළිය`, lat: 6.9497, lng: 80.7891 },
+  { id: `Kandy`, si: `මහනුවර`, lat: 7.2906, lng: 80.6337 },
+  { id: `Puttalam`, si: `පුත්තලම`, lat: 8.0362, lng: 79.8283 },
+  { id: `Jaffna`, si: `යාපනය`, lat: 9.6615, lng: 80.0255 },
+  { id: `Trincomalee`, si: `ත්‍රිකුණාමලය`, lat: 8.5874, lng: 81.2152 },
+  { id: `Monaragala`, si: `මොණරාගල`, lat: 6.8728, lng: 81.3507 }
+];
+
+/* ================= PROCEDURAL JPEG PHOTO ENGINE ================= */
+const PHOTO_CACHE = {};
+
+function seededRand(seed) {
+  let s = seed % 2147483647;
+  if (s <= 0) s += 2147483646;
+  return function() {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+function paintPalmTree(ctx, x, y, scale, rand) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(scale, scale);
+  ctx.strokeStyle = `#2a2118`;
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.quadraticCurveTo(8, -48, 3, -95);
+  ctx.stroke();
+  for (let a = 0; a < 9; a++) {
+    const ang = -Math.PI + (a / 8) * Math.PI * 1.45 + (rand() - 0.5) * 0.18;
+    const len = 38 + rand() * 14;
+    ctx.strokeStyle = a % 2 === 0 ? `#1f4f24` : `#2e6b32`;
+    ctx.lineWidth = 3.2;
+    ctx.beginPath();
+    ctx.moveTo(3, -95);
+    ctx.quadraticCurveTo(3 + Math.cos(ang) * len * 0.55, -95 + Math.sin(ang) * len * 0.35 - 10, 3 + Math.cos(ang) * len, -95 + Math.sin(ang) * len + 12);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function renderSceneToJpeg(type, seed, w, h) {
+  const canvas = document.createElement(`canvas`);
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext(`2d`);
+  const rand = seededRand(seed);
+
+  // Sky gradient
+  const sky = ctx.createLinearGradient(0, 0, 0, h * 0.52);
+  if (type === `tea`) {
+    sky.addColorStop(0, `#9ab5c9`);
+    sky.addColorStop(0.65, `#d7e3e8`);
+    sky.addColorStop(1, `#eef2ed`);
+  } else if (type === `coconut`) {
+    sky.addColorStop(0, `#4d94c4`);
+    sky.addColorStop(0.6, `#97c8e0`);
+    sky.addColorStop(1, `#f2e7c9`);
+  } else if (type === `vegetable`) {
+    sky.addColorStop(0, `#5293bd`);
+    sky.addColorStop(0.65, `#b8d7e5`);
+    sky.addColorStop(1, `#f5e8cc`);
+  } else {
+    sky.addColorStop(0, `#4e8bb8`);
+    sky.addColorStop(0.6, `#a9d1df`);
+    sky.addColorStop(1, `#efe8cf`);
+  }
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, w, h);
+
+  // Soft sun glow & clouds
+  const sunX = w * (0.68 + (rand() - 0.5) * 0.25);
+  const sunY = h * 0.22;
+  const glow = ctx.createRadialGradient(sunX, sunY, 8, sunX, sunY, w * 0.26);
+  glow.addColorStop(0, `rgba(255, 250, 224, 0.85)`);
+  glow.addColorStop(1, `rgba(255, 250, 224, 0)`);
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h * 0.55);
+
+  for (let c = 0; c < 6; c++) {
+    ctx.fillStyle = `rgba(255,255,255,0.34)`;
+    const cx = rand() * w;
+    const cy = h * (0.08 + rand() * 0.22);
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 50 + rand() * 60, 12 + rand() * 14, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Distant Sri Lankan mountain ridges
+  for (let layer = 0; layer < 2; layer++) {
+    ctx.beginPath();
+    const baseY = h * (0.34 + layer * 0.07);
+    ctx.moveTo(0, h);
+    ctx.lineTo(0, baseY);
+    for (let x = 0; x <= w; x += 24) {
+      const hill = Math.sin(x * 0.008 + seed + layer * 2) * (18 - layer * 5) + Math.cos(x * 0.021 + layer) * 9;
+      ctx.lineTo(x, baseY + hill);
+    }
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fillStyle = layer === 0 ? `rgba(76, 108, 92, 0.45)` : `rgba(53, 89, 58, 0.72)`;
+    ctx.fill();
+  }
+
+  if (type === `paddy` || type === `hero_paddy`) {
+    // Terraced green paddy fields + water reflections + bunds
+    const startY = h * 0.44;
+    const tiers = 7;
+    for (let t = 0; t < tiers; t++) {
+      const y1 = startY + (t / tiers) * (h - startY);
+      const y2 = startY + ((t + 1) / tiers) * (h - startY) + 4;
+      const g = ctx.createLinearGradient(0, y1, 0, y2);
+      const hueShift = t % 2 === 0 ? `#3d8b37` : `#4f9e3e`;
+      g.addColorStop(0, hueShift);
+      g.addColorStop(0.35, `#6ab849`);
+      g.addColorStop(1, `#2e6e2b`);
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(0, y1 + Math.sin(t + seed) * 6);
+      for (let x = 0; x <= w; x += 40) {
+        ctx.lineTo(x, y1 + Math.sin(x * 0.012 + t * 1.3 + seed) * 7);
+      }
+      ctx.lineTo(w, y2);
+      ctx.lineTo(0, y2);
+      ctx.closePath();
+      ctx.fill();
+
+      // Water shimmer on terrace
+      ctx.fillStyle = `rgba(195, 232, 238, ${0.14 + (t === 1 || t === 3 ? 0.16 : 0)})`;
+      ctx.fillRect(w * (0.12 + rand() * 0.25), y1 + 4, w * 0.38, (y2 - y1) * 0.25);
+
+      // Earthen bund ridge
+      ctx.strokeStyle = `#596e39`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 40) {
+        const py = y1 + Math.sin(x * 0.012 + t * 1.3 + seed) * 7;
+        if (x === 0) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+      }
+      ctx.stroke();
+
+      // Rice shoot strokes
+      ctx.strokeStyle = `rgba(165, 224, 98, 0.35)`;
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < 110; i++) {
+        const sx = rand() * w;
+        const sy = y1 + 5 + rand() * (y2 - y1 - 6);
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx + (rand() - 0.5) * 4, sy - 6 - rand() * 6);
+        ctx.stroke();
+      }
+    }
+    paintPalmTree(ctx, w * 0.14, startY + 14, 0.58, rand);
+    paintPalmTree(ctx, w * 0.86, startY + 20, 0.68, rand);
+  } else if (type === `tea`) {
+    // Rolling contoured tea estates + morning mist + shade trees
+    for (let hill = 0; hill < 4; hill++) {
+      const topY = h * (0.38 + hill * 0.13);
+      const grad = ctx.createLinearGradient(0, topY, 0, h);
+      grad.addColorStop(0, hill % 2 === 0 ? `#367a39` : `#2a6830`);
+      grad.addColorStop(1, `#1c4a21`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      for (let x = 0; x <= w; x += 18) {
+        const curve = Math.sin(x * 0.011 + hill * 1.6 + seed) * 20;
+        ctx.lineTo(x, topY + curve);
+      }
+      ctx.lineTo(w, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Contoured plucking lanes
+      ctx.strokeStyle = `rgba(130, 198, 102, 0.36)`;
+      ctx.lineWidth = 2.2;
+      for (let r = 1; r <= 4; r++) {
+        ctx.beginPath();
+        for (let x = 0; x <= w; x += 18) {
+          const curve = Math.sin(x * 0.011 + hill * 1.6 + seed) * 20 + r * 11;
+          if (x === 0) ctx.moveTo(x, topY + curve); else ctx.lineTo(x, topY + curve);
+        }
+        ctx.stroke();
+      }
+    }
+    // Highland mist band
+    const mist = ctx.createLinearGradient(0, h * 0.35, 0, h * 0.58);
+    mist.addColorStop(0, `rgba(242, 248, 245, 0)`);
+    mist.addColorStop(0.5, `rgba(242, 248, 245, 0.35)`);
+    mist.addColorStop(1, `rgba(242, 248, 245, 0)`);
+    ctx.fillStyle = mist;
+    ctx.fillRect(0, h * 0.35, w, h * 0.25);
+  } else if (type === `coconut`) {
+    // Lush sandy-loam floor + tall coconut grove
+    const ground = ctx.createLinearGradient(0, h * 0.48, 0, h);
+    ground.addColorStop(0, `#528a3d`);
+    ground.addColorStop(0.5, `#659845`);
+    ground.addColorStop(1, `#8c774d`);
+    ctx.fillStyle = ground;
+    ctx.fillRect(0, h * 0.48, w, h * 0.52);
+
+    // Dappled light bands
+    for (let d = 0; d < 7; d++) {
+      ctx.fillStyle = `rgba(235, 224, 165, 0.16)`;
+      ctx.beginPath();
+      ctx.ellipse(rand() * w, h * (0.62 + rand() * 0.34), 60 + rand() * 70, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    const palmCount = 7;
+    for (let p = 0; p < palmCount; p++) {
+      const px = w * (0.08 + (p / (palmCount - 1)) * 0.84) + (rand() - 0.5) * 20;
+      const py = h * (0.58 + (p % 3) * 0.1);
+      paintPalmTree(ctx, px, py, 0.78 + (p % 3) * 0.22, rand);
+    }
+  } else {
+    // Dry-zone / Highland Vegetable Beds with rich soil furrows & leafy rows
+    const soil = ctx.createLinearGradient(0, h * 0.45, 0, h);
+    soil.addColorStop(0, `#6e4e37`);
+    soil.addColorStop(1, `#543825`);
+    ctx.fillStyle = soil;
+    ctx.fillRect(0, h * 0.45, w, h * 0.55);
+
+    // Perspective raised vegetable beds
+    const vpX = w * 0.52;
+    const vpY = h * 0.43;
+    const rows = 9;
+    for (let r = -4; r <= 4; r++) {
+      const bX = w * 0.5 + r * (w * 0.13);
+      ctx.fillStyle = r % 2 === 0 ? `#7d5a3f` : `#694a33`;
+      ctx.beginPath();
+      ctx.moveTo(vpX + r * 14, vpY);
+      ctx.lineTo(vpX + (r + 0.72) * 14, vpY);
+      ctx.lineTo(bX + w * 0.08, h);
+      ctx.lineTo(bX - w * 0.02, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Leafy green crop clusters along each bed
+      for (let step = 0.1; step <= 0.96; step += 0.085) {
+        const cx = vpX + r * 14 + (bX - vpX - r * 14) * step + step * 10;
+        const cy = vpY + (h - vpY) * step;
+        const rad = 4 + step * 14;
+        ctx.fillStyle = step % 0.17 < 0.09 ? `#3a8734` : `#51a642`;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rad * 1.15, rad * 0.68, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    paintPalmTree(ctx, w * 0.89, h * 0.49, 0.52, rand);
+  }
+
+  // Subtle organic grain for photographic texture
+  ctx.fillStyle = `rgba(255, 248, 232, 0.03)`;
+  ctx.fillRect(0, 0, w, h);
+  return canvas.toDataURL(`image/jpeg`, 0.84);
+}
+
+function initPhotoLibrary() {
+  PHOTO_CACHE.hero_paddy = "./images/paddy.jpg";
+  PHOTO_CACHE.paddy_1 = "./images/paddy.jpg";
+  PHOTO_CACHE.paddy_2 = "./images/paddy.jpg";
+  PHOTO_CACHE.paddy_3 = "./images/paddy.jpg";
+  PHOTO_CACHE.tea_1 = "./images/tea.jpg";
+  PHOTO_CACHE.tea_2 = "./images/tea.jpg";
+  PHOTO_CACHE.coconut_1 = "./images/coconut.jpg";
+  PHOTO_CACHE.coconut_2 = "./images/coconut.jpg";
+  PHOTO_CACHE.veg_1 = "./images/vegetable.jpg";
+  PHOTO_CACHE.veg_2 = "./images/vegetable.jpg";
+  PHOTO_CACHE.veg_3 = "./images/vegetable.jpg";
+}
+
+/* ================= SRI LANKA VECTOR GIS GEOMETRY ================= */
+const SL_OUTLINE_GEO = {
+  type: `Feature`,
+  properties: { name: `Sri Lanka` },
+  geometry: {
+    type: `Polygon`,
+    coordinates: [[
+      [80.03, 9.83], [80.24, 9.75], [80.52, 9.52], [80.82, 9.21], [81.14, 8.85],
+      [81.25, 8.58], [81.46, 8.15], [81.71, 7.72], [81.86, 7.36], [81.88, 7.01],
+      [81.74, 6.72], [81.49, 6.38], [81.14, 6.13], [80.78, 5.96], [80.54, 5.92],
+      [80.21, 5.99], [79.96, 6.26], [79.88, 6.62], [79.84, 6.93], [79.82, 7.31],
+      [79.79, 7.82], [79.71, 8.21], [79.86, 8.64], [79.92, 9.01], [79.98, 9.41],
+      [79.72, 9.63], [79.85, 9.81], [80.03, 9.83]
+    ]]
+  }
+};
+
+const SL_RIVERS_GEO = {
+  type: `FeatureCollection`,
+  features: [
+    { type: `Feature`, properties: { name: `Mahaweli Ganga` }, geometry: { type: `LineString`, coordinates: [[80.62, 6.98], [80.68, 7.29], [80.98, 7.62], [81.08, 8.05], [81.19, 8.48]] } },
+    { type: `Feature`, properties: { name: `Walawe Ganga` }, geometry: { type: `LineString`, coordinates: [[80.82, 6.68], [80.91, 6.42], [81.02, 6.12]] } },
+    { type: `Feature`, properties: { name: `Kelani Ganga` }, geometry: { type: `LineString`, coordinates: [[80.48, 6.89], [80.21, 6.96], [79.87, 6.96]] } },
+    { type: `Feature`, properties: { name: `Malwathu Oya` }, geometry: { type: `LineString`, coordinates: [[80.52, 8.15], [80.40, 8.32], [80.12, 8.65], [79.91, 8.81]] } }
+  ]
+};
+
+/* ================= 14 REALISTIC DEMO LAND LISTINGS ================= */
+const DEFAULT_LANDS = [
+  {
+    id: `L01`, title: `Kala Wewa Tank-Fed Paddy Tract`, titleSi: `කලා වැව ආශ්‍රිත සරු කුඹුරු යාය`,
+    district: `Anuradhapura`, category: `paddy`, sizeAcres: 4.5, priceMonthly: 42000, cycle: `monthly`,
+    water: `tank`, road: true, elec: true, soil: `alluvial`,
+    crops: `Bg 352 Paddy, Samba, Mung Bean`, lat: 8.018, lng: 80.531,
+    photoKey: `paddy_1`, ownerId: `owner1`, ownerName: `Bandara Herath`, status: `approved`
+  },
+  {
+    id: `L02`, title: `Parakrama Samudra Irrigated Paddy`, titleSi: `පරාක්‍රම සමුද්‍රය වාරි කුඹුරු ඉඩම`,
+    district: `Polonnaruwa`, category: `paddy`, sizeAcres: 6.0, priceMonthly: 55000, cycle: `monthly`,
+    water: `canal`, road: true, elec: true, soil: `alluvial`,
+    crops: `Keeri Samba, Red Nadu`, lat: 7.912, lng: 80.996,
+    photoKey: `paddy_2`, ownerId: `owner2`, ownerName: `S. Wickramasinghe`, status: `approved`
+  },
+  {
+    id: `L03`, title: `Pannala Fertile Coconut & Intercrop Estate`, titleSi: `පන්නල පොල් සහ අතුරු භෝග වත්ත`,
+    district: `Kurunegala`, category: `coconut`, sizeAcres: 5.0, priceMonthly: 68000, cycle: `monthly`,
+    water: `well`, road: true, elec: true, soil: `sandy`,
+    crops: `King Coconut, Pineapple, Pepper`, lat: 7.332, lng: 80.029,
+    photoKey: `coconut_1`, ownerId: `owner1`, ownerName: `Bandara Herath`, status: `approved`
+  },
+  {
+    id: `L04`, title: `Gal Oya Lowland Mechanized Paddy`, titleSi: `ගල්ඔය යාන්ත්‍රික කුඹුරු ඉඩම`,
+    district: `Ampara`, category: `paddy`, sizeAcres: 8.0, priceMonthly: 72000, cycle: `monthly`,
+    water: `canal`, road: true, elec: false, soil: `alluvial`,
+    crops: `Bg 366 Paddy, Groundnut`, lat: 7.285, lng: 81.662,
+    photoKey: `paddy_3`, ownerId: `owner2`, ownerName: `S. Wickramasinghe`, status: `approved`
+  },
+  {
+    id: `L05`, title: `Dambulla Dry-Zone Onion & Vegetable Plot`, titleSi: `දඹුල්ල රතු ළූණු සහ එළවළු බිම`,
+    district: `Matale`, category: `vegetable`, sizeAcres: 2.5, priceMonthly: 38000, cycle: `monthly`,
+    water: `well`, road: true, elec: true, soil: `reddish`,
+    crops: `Big Onion, Chilli, Pumpkin`, lat: 7.861, lng: 80.651,
+    photoKey: `veg_1`, ownerId: `owner1`, ownerName: `Bandara Herath`, status: `approved`
+  },
+  {
+    id: `L06`, title: `Walawe Basin Banana & Vegetable Farm`, titleSi: `වලවේ කෙසෙල් සහ එළවළු ගොවිපළ`,
+    district: `Hambantota`, category: `vegetable`, sizeAcres: 3.5, priceMonthly: 44000, cycle: `monthly`,
+    water: `canal`, road: true, elec: true, soil: `reddish`,
+    crops: `Ambul Banana, Okra, Papaya`, lat: 6.245, lng: 80.985,
+    photoKey: `veg_2`, ownerId: `owner3`, ownerName: `N. Jayawardena`, status: `approved`
+  },
+  {
+    id: `L07`, title: `Welimada Terraced Highland Vegetable Plot`, titleSi: `වැලිමඩ උඩරට එළවළු හෙල්මළු බිම`,
+    district: `Badulla`, category: `vegetable`, sizeAcres: 1.75, priceMonthly: 48000, cycle: `monthly`,
+    water: `canal`, road: true, elec: true, soil: `redyellow`,
+    crops: `Potato, Carrot, Leeks, Cabbage`, lat: 6.901, lng: 80.912,
+    photoKey: `veg_3`, ownerId: `owner3`, ownerName: `N. Jayawardena`, status: `approved`
+  },
+  {
+    id: `L08`, title: `Mirigama Lush Coconut & Spice Grove`, titleSi: `මීරිගම සරු පොල් සහ කුළුබඩු වත්ත`,
+    district: `Gampaha`, category: `coconut`, sizeAcres: 3.0, priceMonthly: 58000, cycle: `monthly`,
+    water: `well`, road: true, elec: true, soil: `sandy`,
+    crops: `Coconut, Cinnamon, Ginger`, lat: 7.245, lng: 80.128,
+    photoKey: `coconut_2`, ownerId: `owner1`, ownerName: `Bandara Herath`, status: `approved`
+  },
+  {
+    id: `L09`, title: `Talawakele Misty Highland Tea Estate`, titleSi: `තලවකැලේ කඳුකර තේ වත්ත`,
+    district: `Nuwara Eliya`, category: `tea`, sizeAcres: 4.0, priceMonthly: 85000, cycle: `monthly`,
+    water: `canal`, road: true, elec: true, soil: `redyellow`,
+    crops: `VP Tea Clones, Avocado Shade`, lat: 6.935, lng: 80.658,
+    photoKey: `tea_1`, ownerId: `owner2`, ownerName: `S. Wickramasinghe`, status: `approved`
+  },
+  {
+    id: `L10`, title: `Gampola Mid-Country Tea & Pepper Slope`, titleSi: `ගම්පොළ මැදරට තේ සහ ගම්මිරිස් ඉඩම`,
+    district: `Kandy`, category: `tea`, sizeAcres: 2.25, priceMonthly: 62000, cycle: `monthly`,
+    water: `none`, road: true, elec: true, soil: `redyellow`,
+    crops: `Mid-grown Tea, Black Pepper`, lat: 7.164, lng: 80.576,
+    photoKey: `tea_2`, ownerId: `owner3`, ownerName: `N. Jayawardena`, status: `leased`
+  },
+  {
+    id: `L11`, title: `Chilaw Coastal Coconut Plantation`, titleSi: `හලාවත වෙරළබඩ පොල් වගා ඉඩම`,
+    district: `Puttalam`, category: `coconut`, sizeAcres: 7.0, priceMonthly: 79000, cycle: `monthly`,
+    water: `well`, road: true, elec: true, soil: `sandy`,
+    crops: `Hybrid Coconut, Cashew`, lat: 7.575, lng: 79.805,
+    photoKey: `coconut_1`, ownerId: `owner2`, ownerName: `S. Wickramasinghe`, status: `approved`
+  },
+  {
+    id: `L12`, title: `Valikamam Red-Soil Irrigated Vegetable Farm`, titleSi: `වලිකාමම් රතු පස් එළවළු ගොවිපළ`,
+    district: `Jaffna`, category: `vegetable`, sizeAcres: 1.5, priceMonthly: 36000, cycle: `monthly`,
+    water: `well`, road: true, elec: true, soil: `latosolic`,
+    crops: `Red Onion, Jaffna Chilli, Beetroot`, lat: 9.735, lng: 80.032,
+    photoKey: `veg_1`, ownerId: `owner3`, ownerName: `N. Jayawardena`, status: `approved`
+  },
+  {
+    id: `L13`, title: `Kantale Tank-Irrigated Paddy Field`, titleSi: `කන්තලේ වැව් ජල කුඹුරු ඉඩම`,
+    district: `Trincomalee`, category: `paddy`, sizeAcres: 5.5, priceMonthly: 49000, cycle: `monthly`,
+    water: `tank`, road: true, elec: false, soil: `alluvial`,
+    crops: `At 362 Paddy, Cowpea`, lat: 8.362, lng: 80.996,
+    photoKey: `paddy_2`, ownerId: `owner2`, ownerName: `S. Wickramasinghe`, status: `approved`
+  },
+  {
+    id: `L14`, title: `Wellawaya Fertile Maize & Vegetable Land`, titleSi: `වැල්ලවාය බඩඉරිඟු සහ එළවළු බිම`,
+    district: `Monaragala`, category: `vegetable`, sizeAcres: 4.0, priceMonthly: 34000, cycle: `monthly`,
+    water: `well`, road: false, elec: false, soil: `reddish`,
+    crops: `Maize, Bitter Gourd, Lime`, lat: 6.736, lng: 81.102,
+    photoKey: `veg_2`, ownerId: `owner1`, ownerName: `Bandara Herath`, status: `approved`
+  },
+  {
+    id: `L15`, title: `Minneriya Canal-Side Paddy Block`, titleSi: `මින්නේරිය ඇළ අයිනේ කුඹුරු කොටස`,
+    district: `Polonnaruwa`, category: `paddy`, sizeAcres: 3.25, priceMonthly: 39000, cycle: `monthly`,
+    water: `canal`, road: true, elec: false, soil: `alluvial`,
+    crops: `Bg 358 Paddy, Green Gram`, lat: 8.034, lng: 80.892,
+    photoKey: `paddy_1`, ownerId: `owner1`, ownerName: `Bandara Herath`, status: `pending`
+  }
+];
+
+const DEFAULT_REQUESTS = [
+  {
+    id: `R01`, landId: `L01`, farmerName: `K.M. Ruwan Kumara`,
+    duration: `12 Months (Yala + Maha)`, crop: `Bg 352 Paddy`,
+    note: `Experienced paddy farmer from Galnewa with own tractor.`,
+    status: `pending`, createdAt: `2026-11-18`
+  },
+  {
+    id: `R02`, landId: `L03`, farmerName: `K.M. Ruwan Kumara`,
+    duration: `24 Months (Multi-Year)`, crop: `Pineapple Intercrop`,
+    note: `Planning drip-irrigated Mauritius pineapple under coconut canopy.`,
+    status: `accepted`, createdAt: `2026-11-12`
+  },
+  {
+    id: `R03`, landId: `L10`, farmerName: `P.D. Sunil Shantha`,
+    duration: `24 Months (Multi-Year)`, crop: `VP Tea & Black Pepper`,
+    note: `Full family team available for regular plucking rounds.`,
+    status: `accepted`, createdAt: `2026-11-05`
+  },
+  {
+    id: `R04`, landId: `L05`, farmerName: `K.M. Ruwan Kumara`,
+    duration: `6 Months (1 Season)`, crop: `Big Onion`,
+    note: `Seeking Yala season lease with agro-well pump access.`,
+    status: `rejected`, createdAt: `2026-10-29`
+  }
+];
+
+/* ================= APPLICATION STATE ================= */
+const APP = {
+  lang: `en`,
+  role: `farmer`,
+  farmerTab: `explore`,
+  mapOnly: false,
+  mapLayer: `vector`,
+  lands: [],
+  requests: [],
+  favorites: [`L01`, `L09`],
+  compareIds: [],
+  activeModalLandId: null,
+  wizardStep: 1,
+  wizardCoords: { lat: 7.8731, lng: 80.7718 },
+  wizardPhotos: [],
+  uploadedPhotoStore: {},
+  districtChart: null,
+  requestChart: null
+};
+
+let mainMap = null;
+let vectorBasemapLayer = null;
+let riversLayer = null;
+let markersGroup = null;
+let pickerMap = null;
+let pickerMarker = null;
+
+function cloneDefaults() {
+  APP.lands = JSON.parse(JSON.stringify(DEFAULT_LANDS));
+  APP.requests = JSON.parse(JSON.stringify(DEFAULT_REQUESTS));
+  APP.favorites = [`L01`, `L09`];
+  APP.compareIds = [];
+  APP.uploadedPhotoStore = {};
+}
+
+function getLandPhoto(land) {
+  if (land.hasCustomPhoto && APP.uploadedPhotoStore[land.id] && APP.uploadedPhotoStore[land.id].length > 0) {
+    return APP.uploadedPhotoStore[land.id][0];
+  }
+  return PHOTO_CACHE[land.photoKey] || PHOTO_CACHE.paddy_1;
+}
+
+function getLandGallery(land) {
+  if (land.hasCustomPhoto && APP.uploadedPhotoStore[land.id] && APP.uploadedPhotoStore[land.id].length > 0) {
+    return APP.uploadedPhotoStore[land.id];
+  }
+  return [getLandPhoto(land)];
+}
+
+async function persistState() {
+  if (!window.notebookAppApi || typeof window.notebookAppApi.setAppState !== `function`) return;
+  try {
+    const cleanLands = APP.lands.map(l => ({
+      id: l.id, title: l.title, titleSi: l.titleSi, district: l.district,
+      category: l.category, sizeAcres: l.sizeAcres, priceMonthly: l.priceMonthly,
+      cycle: l.cycle, water: l.water, road: l.road, elec: l.elec, soil: l.soil,
+      crops: l.crops, lat: l.lat, lng: l.lng, photoKey: l.photoKey,
+      ownerId: l.ownerId, ownerName: l.ownerName, status: l.status
+    }));
+    await window.notebookAppApi.setAppState({
+      lang: APP.lang,
+      role: APP.role,
+      lands: cleanLands,
+      requests: APP.requests,
+      favorites: APP.favorites
+    });
+  } catch (err) {
+    // Graceful silent fallback if host quota or offline
+  }
+}
+
+async function loadSavedState() {
+  cloneDefaults();
+  if (!window.notebookAppApi || typeof window.notebookAppApi.getAppState !== `function`) return;
+  try {
+    const saved = await window.notebookAppApi.getAppState();
+    if (saved && Array.isArray(saved.lands) && saved.lands.length > 0) {
+      APP.lands = saved.lands;
+      if (Array.isArray(saved.requests)) APP.requests = saved.requests;
+      if (Array.isArray(saved.favorites)) APP.favorites = saved.favorites;
+      if (saved.lang === `si` || saved.lang === `en`) APP.lang = saved.lang;
+      if ([`farmer`, `owner`, `admin`].includes(saved.role)) APP.role = saved.role;
+    }
+  } catch (err) {
+    // Fallback to default demo dataset
+  }
+}
+
+/* ================= SMART MATCH SCORING ALGORITHM ================= */
+function getFilterPrefs() {
+  return {
+    district: document.getElementById(`f-district`) ? document.getElementById(`f-district`).value : `ALL`,
+    crop: document.getElementById(`f-crop`) ? document.getElementById(`f-crop`).value : `ALL`,
+    minSize: document.getElementById(`f-size`) ? parseFloat(document.getElementById(`f-size`).value) : 1,
+    maxPrice: document.getElementById(`f-price`) ? parseInt(document.getElementById(`f-price`).value, 10) : 90000,
+    water: document.getElementById(`f-water`) ? document.getElementById(`f-water`).value : `ALL`,
+    road: document.getElementById(`f-road`) ? document.getElementById(`f-road`).checked : false,
+    elec: document.getElementById(`f-elec`) ? document.getElementById(`f-elec`).checked : false
+  };
+}
+
+function computeMatchScore(land, prefs) {
+  // Location 30%, Price 25%, Size 20%, Water 15%, Facilities 10%
+  let locScore = 30;
+  if (prefs.district !== `ALL`) {
+    locScore = land.district === prefs.district ? 30 : 6;
+  }
+
+  let priceScore = 25;
+  if (land.priceMonthly <= prefs.maxPrice) {
+    priceScore = 25;
+  } else {
+    const ratio = Math.max(0, 1 - (land.priceMonthly - prefs.maxPrice) / prefs.maxPrice);
+    priceScore = Math.round(25 * ratio);
+  }
+
+  let sizeScore = 20;
+  if (land.sizeAcres >= prefs.minSize) {
+    sizeScore = 20;
+  } else {
+    sizeScore = Math.round(20 * (land.sizeAcres / prefs.minSize));
+  }
+
+  let waterScore = 15;
+  if (prefs.water !== `ALL`) {
+    waterScore = land.water === prefs.water ? 15 : (land.water !== `none` ? 6 : 0);
+  } else if (land.water === `none`) {
+    waterScore = 9;
+  }
+
+  let facScore = 10;
+  let needed = 0;
+  let met = 0;
+  if (prefs.road) { needed++; if (land.road) met++; }
+  if (prefs.elec) { needed++; if (land.elec) met++; }
+  if (needed > 0) {
+    facScore = Math.round(10 * (met / needed));
+  } else {
+    facScore = (land.road ? 5 : 2) + (land.elec ? 5 : 2);
+  }
+
+  return Math.min(100, Math.max(15, locScore + priceScore + sizeScore + waterScore + facScore));
+}
+
+function scoreTier(score, status) {
+  if (status === `leased`) return `score-low`;
+  if (score >= 80) return `score-high`;
+  if (score >= 50) return `score-mid`;
+  return `score-low`;
+}
+
+function scoreColorHex(score, status) {
+  if (status === `leased`) return `#b83230`;
+  if (score >= 80) return `#2e7d32`;
+  if (score >= 50) return `#c87414`;
+  return `#b83230`;
+}
+
+function buildRingSvg(score, tier) {
+  const r = 11;
+  const circ = 2 * Math.PI * r;
+  const offset = circ * (1 - score / 100);
+  const stroke = tier === `score-high` ? `var(--positive)` : tier === `score-mid` ? `var(--warning)` : `var(--error)`;
+  return `<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+    <circle cx="14" cy="14" r="${r}" fill="none" stroke="var(--surface-container-high)" stroke-width="3"></circle>
+    <circle cx="14" cy="14" r="${r}" fill="none" stroke="${stroke}" stroke-width="3" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 14 14)"></circle>
+  </svg>`;
+}
+
+/* ================= INITIALIZATION & RENDERING ================= */
+function t(key) {
+  const dict = I18N[APP.lang] || I18N.en;
+  return dict[key] !== undefined ? dict[key] : key;
+}
+
+function districtLabel(name) {
+  if (APP.lang === `en`) return name;
+  const found = DISTRICTS.find(d => d.id === name);
+  return found ? found.si : name;
+}
+
+function landTitle(land) {
+  return APP.lang === `si` && land.titleSi ? land.titleSi : land.title;
+}
+
+function populateDropdowns() {
+  const dict = I18N[APP.lang];
+  const fDist = document.getElementById(`f-district`);
+  const wDist = document.getElementById(`w-district`);
+  const prevDist = fDist ? fDist.value : `ALL`;
+  if (fDist) {
+    fDist.innerHTML = `<option value="ALL">${dict.allDistricts}</option>` +
+      DISTRICTS.map(d => `<option value="${d.id}">${APP.lang === `si` ? d.si : d.id}</option>`).join(``);
+    fDist.value = prevDist || `ALL`;
+  }
+  if (wDist) {
+    const prevW = wDist.value || `Anuradhapura`;
+    wDist.innerHTML = DISTRICTS.map(d => `<option value="${d.id}">${APP.lang === `si` ? d.si : d.id}</option>`).join(``);
+    wDist.value = prevW;
+  }
+
+  const fCrop = document.getElementById(`f-crop`);
+  const wCat = document.getElementById(`w-category`);
+  const prevCrop = fCrop ? fCrop.value : `ALL`;
+  const catOpts = [`paddy`, `tea`, `coconut`, `vegetable`].map(c => `<option value="${c}">${dict.catNames[c]}</option>`).join(``);
+  if (fCrop) {
+    fCrop.innerHTML = `<option value="ALL">${dict.allTypes}</option>` + catOpts;
+    fCrop.value = prevCrop || `ALL`;
+  }
+  if (wCat) wCat.innerHTML = catOpts;
+
+  const fWater = document.getElementById(`f-water`);
+  const wWater = document.getElementById(`w-water`);
+  const prevWater = fWater ? fWater.value : `ALL`;
+  const waterOpts = [`tank`, `canal`, `well`, `none`].map(w => `<option value="${w}">${dict.waterNames[w]}</option>`).join(``);
+  if (fWater) {
+    fWater.innerHTML = `<option value="ALL">${dict.anyWater}</option>` + waterOpts;
+    fWater.value = prevWater || `ALL`;
+  }
+  if (wWater) wWater.innerHTML = waterOpts;
+
+  const wSoil = document.getElementById(`w-soil`);
+  if (wSoil) {
+    wSoil.innerHTML = Object.keys(dict.soilNames).map(s => `<option value="${s}">${dict.soilNames[s]}</option>`).join(``);
+  }
+}
+
+function applyTranslations() {
+  document.documentElement.lang = APP.lang === `si` ? `si` : `en`;
+  document.querySelectorAll(`[data-i18n]`).forEach(el => {
+    const key = el.getAttribute(`data-i18n`);
+    const val = t(key);
+    if (typeof val === `string`) el.textContent = val;
+  });
+  const langTxt = document.getElementById(`lang-toggle-text`);
+  if (langTxt) langTxt.textContent = APP.lang === `en` ? `සිංහල` : `English`;
+  populateDropdowns();
+}
+
+function renderSeasonStrip() {
+  const el = document.getElementById(`season-cells`);
+  if (!el) return;
+  const months = [`J`, `F`, `M`, `A`, `M`, `J`, `J`, `A`, `S`, `O`, `N`, `D`];
+  el.innerHTML = months.map((m, idx) => {
+    const isMaha = idx >= 9 || idx <= 2;
+    return `<span class="season-cell ${isMaha ? `is-maha` : `is-yala`}" title="${isMaha ? `Maha Season` : `Yala Season`}">${m}</span>`;
+  }).join(``);
+}
+
+function animateCounter(elId, target) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const start = 0;
+  const duration = 500;
+  const t0 = performance.now();
+  function step(now) {
+    const p = Math.min(1, (now - t0) / duration);
+    el.textContent = Math.round(start + (target - start) * p).toLocaleString();
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function updateTopStats() {
+  const approved = APP.lands.filter(l => l.status === `approved` || l.status === `leased`);
+  const totalAcres = Math.round(approved.reduce((s, l) => s + Number(l.sizeAcres), 0));
+  const distCount = new Set(approved.map(l => l.district)).size;
+  animateCounter(`stat-acres`, totalAcres);
+  animateCounter(`stat-districts`, distCount);
+  animateCounter(`stat-listings`, approved.length);
+  animateCounter(`stat-requests`, APP.requests.length);
+}
+
+/* ================= LEAFLET SRI LANKA VECTOR GIS MAP ================= */
+function initMainMap() {
+  const mapEl = document.getElementById(`sl-map`);
+  if (!mapEl || mainMap) return;
+  mainMap = L.map(`sl-map`, {
+    center: [7.87, 80.70],
+    zoom: 7,
+    minZoom: 7,
+    maxZoom: 18,
+    scrollWheelZoom: true
+  });
+  mainMap.attributionControl.addAttribution(`Vector GIS: Sri Lanka Agricultural Atlas`);
+
+  vectorBasemapLayer = L.geoJSON(SL_OUTLINE_GEO, {
+    style: {
+      fillColor: `#ece5d3`,
+      fillOpacity: 1,
+      color: `#6e856d`,
+      weight: 2
+    }
+  }).addTo(mainMap);
+
+  riversLayer = L.geoJSON(SL_RIVERS_GEO, {
+    style: { color: `#5b94b5`, weight: 2.2, opacity: 0.78 }
+  }).addTo(mainMap);
+
+  // District boundary reference rings for GIS context
+  DISTRICTS.forEach(d => {
+    L.circle([d.lat, d.lng], {
+      radius: 17000,
+      color: `#8da38c`,
+      weight: 0.8,
+      dashArray: `3 4`,
+      fillOpacity: 0.04
+    }).bindTooltip(`${d.id} (${d.si})`, { direction: `center` }).addTo(mainMap);
+  });
+
+  markersGroup = L.layerGroup().addTo(mainMap);
+}
+
+function setMapLayer(mode) {
+  APP.mapLayer = mode;
+  const vecBtn = document.getElementById(`layer-vec-btn`);
+  const satBtn = document.getElementById(`layer-sat-btn`);
+  const mapEl = document.getElementById(`sl-map`);
+  if (vecBtn) vecBtn.setAttribute(`aria-pressed`, mode === `vector` ? `true` : `false`);
+  if (satBtn) satBtn.setAttribute(`aria-pressed`, mode === `satellite` ? `true` : `false`);
+  if (mapEl) mapEl.classList.toggle(`is-satellite`, mode === `satellite`);
+
+  if (vectorBasemapLayer) {
+    vectorBasemapLayer.setStyle(mode === `satellite`
+      ? { fillColor: `#2b4d33`, fillOpacity: 1, color: `#86ba8b`, weight: 2 }
+      : { fillColor: `#ece5d3`, fillOpacity: 1, color: `#6e856d`, weight: 2 });
+  }
+  if (riversLayer) {
+    riversLayer.setStyle(mode === `satellite`
+      ? { color: `#5ec4e8`, weight: 2.5, opacity: 0.9 }
+      : { color: `#5b94b5`, weight: 2.2, opacity: 0.78 });
+  }
+}
+
+function getFilteredAndScoredLands() {
+  const prefs = getFilterPrefs();
+  const visible = APP.lands.filter(l => l.status === `approved` || l.status === `leased`);
+  const filtered = visible.filter(l => {
+    if (prefs.district !== `ALL` && l.district !== prefs.district) return false;
+    if (prefs.crop !== `ALL` && l.category !== prefs.crop) return false;
+    if (l.sizeAcres < prefs.minSize * 0.65) return false;
+    if (l.priceMonthly > prefs.maxPrice * 1.2) return false;
+    if (prefs.water !== `ALL` && l.water !== prefs.water) return false;
+    if (prefs.road && !l.road) return false;
+    if (prefs.elec && !l.elec) return false;
+    return true;
+  });
+  return filtered
+    .map(l => ({ land: l, score: computeMatchScore(l, prefs) }))
+    .sort((a, b) => {
+      if (a.land.status === `leased` && b.land.status !== `leased`) return 1;
+      if (b.land.status === `leased` && a.land.status !== `leased`) return -1;
+      return b.score - a.score;
+    });
+}
+
+function renderMapMarkers(scoredList) {
+  if (!mainMap || !markersGroup) return;
+  markersGroup.clearLayers();
+  scoredList.forEach(({ land, score }) => {
+    const color = scoreColorHex(score, land.status);
+    const marker = L.circleMarker([land.lat, land.lng], {
+      radius: 9,
+      color: `#ffffff`,
+      weight: 2.5,
+      fillColor: color,
+      fillOpacity: 0.96
+    });
+    const photo = getLandPhoto(land);
+    const popupHtml = `
+      <div style="width:225px;font-family:inherit">
+        <img src="${photo}" alt="${landTitle(land)}" style="width:100%;height:110px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px">
+        <div style="font-size:11px;color:#5c635c">${districtLabel(land.district)} • ${t(`illustrativePhoto`)}</div>
+        <strong style="display:block;font-size:14px;margin:3px 0">${landTitle(land)}</strong>
+        <div style="font-size:12px;margin-bottom:8px">${land.sizeAcres} ${t(`acresShort`)} • LKR ${land.priceMonthly.toLocaleString()} ${t(`perMonth`)} • <b>${score}%</b></div>
+        <button type="button" onclick="openDetailModal('${land.id}')" style="width:100%;min-height:38px;border:0;border-radius:8px;background:#2e7d32;color:#fff;font-weight:700;cursor:pointer">${t(`viewDetails`)}</button>
+      </div>
+    `;
+    marker.bindPopup(popupHtml);
+    marker.on(`click`, function() {
+      mainMap.flyTo([land.lat, land.lng], 11, { duration: 0.65 });
+    });
+    marker.addTo(markersGroup);
+  });
+}
+
+/* ================= CARDS RENDERING ================= */
+function buildLandCardHtml(land, score, isOwnerView) {
+  const dict = I18N[APP.lang];
+  const tier = scoreTier(score, land.status);
+  const isFav = APP.favorites.includes(land.id);
+  const isComp = APP.compareIds.includes(land.id);
+  const photo = getLandPhoto(land);
+  const statusClass = land.status === `approved` ? `status-approved` : land.status === `pending` ? `status-pending` : `status-leased`;
+  const statusText = land.status === `approved` ? dict.approvedTag : land.status === `pending` ? dict.pendingTag : dict.leasedTag;
+
+  return `
+    <article class="land-card">
+      <div class="card-media">
+        <img src="${photo}" alt="${landTitle(land)}">
+        <span class="photo-pill">${dict.illustrativePhoto}</span>
+        ${!isOwnerView ? `
+          <button type="button" class="fav-btn ${isFav ? `is-fav` : ``}" aria-label="Toggle favorite" onclick="toggleFavorite('${land.id}')">
+            <i data-lucide="heart" style="width:18px;height:18px"></i>
+          </button>
+          <div class="match-ring-badge ${tier}">
+            ${buildRingSvg(score, tier)}
+            <span>${score}%</span>
+          </div>
+        ` : ``}
+      </div>
+      <div class="card-body">
+        <div class="card-meta-row">
+          <span class="district-pill">${districtLabel(land.district)}</span>
+          <span class="status-badge ${statusClass}">${statusText}</span>
+        </div>
+        <h3 class="card-title">${landTitle(land)}</h3>
+        <div class="card-specs">
+          <div class="spec-item"><i data-lucide="maximize-2" style="width:14px;height:14px"></i><span>${land.sizeAcres} ${dict.acresShort}</span></div>
+          <div class="spec-item"><i data-lucide="droplets" style="width:14px;height:14px"></i><span>${dict.waterNames[land.water]}</span></div>
+          <div class="spec-item"><i data-lucide="sprout" style="width:14px;height:14px"></i><span>${dict.catNames[land.category]}</span></div>
+          <div class="spec-item"><i data-lucide="zap" style="width:14px;height:14px"></i><span>${land.road ? dict.roadShort : dict.trackShort} ${land.elec ? dict.elecShort : ``}</span></div>
+        </div>
+        <div class="card-price">LKR ${land.priceMonthly.toLocaleString()} <small>${dict.perMonth}</small></div>
+        <div class="card-actions">
+          ${!isOwnerView ? `
+            <label class="compare-check">
+              <input type="checkbox" ${isComp ? `checked` : ``} onchange="toggleCompare('${land.id}', this.checked)">
+              <span>${dict.compareLabel}</span>
+            </label>
+          ` : `<span class="district-pill">${land.ownerName}</span>`}
+          <button type="button" class="btn btn-primary btn-sm" onclick="openDetailModal('${land.id}')">${dict.viewDetails}</button>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function applyFilters() {
+  const scored = getFilteredAndScoredLands();
+  const grid = document.getElementById(`listings-grid`);
+  const pill = document.getElementById(`results-count-pill`);
+  if (pill) pill.textContent = `${scored.length} ${APP.lang === `si` ? `ඉඩම්` : `lands`}`;
+  if (grid) {
+    if (scored.length === 0) {
+      grid.innerHTML = `<div class="dashboard-panel" style="grid-column:1/-1">${t(`noResults`)}</div>`;
+    } else {
+      grid.innerHTML = scored.map(({ land, score }) => buildLandCardHtml(land, score, false)).join(``);
+    }
+  }
+  renderMapMarkers(scored);
+  refreshLucide();
+}
+
+function updateSizeSlider(val) {
+  const lbl = document.getElementById(`f-size-val`);
+  if (lbl) lbl.textContent = `${Number(val).toFixed(1)}+ ac`;
+  applyFilters();
+}
+
+function updatePriceSlider(val) {
+  const lbl = document.getElementById(`f-price-val`);
+  if (lbl) lbl.textContent = `LKR ${parseInt(val, 10).toLocaleString()}`;
+  applyFilters();
+}
+
+function resetFilters() {
+  const d = document.getElementById(`f-district`);
+  const c = document.getElementById(`f-crop`);
+  const s = document.getElementById(`f-size`);
+  const p = document.getElementById(`f-price`);
+  const w = document.getElementById(`f-water`);
+  const r = document.getElementById(`f-road`);
+  const e = document.getElementById(`f-elec`);
+  if (d) d.value = `ALL`;
+  if (c) c.value = `ALL`;
+  if (s) s.value = `1`;
+  if (p) p.value = `90000`;
+  if (w) w.value = `ALL`;
+  if (r) r.checked = false;
+  if (e) e.checked = false;
+  updateSizeSlider(1);
+  updatePriceSlider(90000);
+}
+
+/* ================= ROLE SWITCHING & NAVIGATION ================= */
+function switchRole(role) {
+  APP.role = role;
+  [`farmer`, `owner`, `admin`].forEach(r => {
+    const btn = document.getElementById(`role-btn-${r}`);
+    const view = document.getElementById(`view-${r}`);
+    if (btn) btn.setAttribute(`aria-pressed`, r === role ? `true` : `false`);
+    if (view) view.classList.toggle(`is-hidden`, r !== role);
+  });
+  if (role === `farmer`) {
+    applyFilters();
+    setTimeout(() => { if (mainMap) mainMap.invalidateSize(); }, 100);
+  } else if (role === `owner`) {
+    renderOwnerDashboard();
+  } else if (role === `admin`) {
+    renderAdminDashboard();
+  }
+  persistState();
+  refreshLucide();
+}
+
+function setFarmerTab(tab) {
+  APP.farmerTab = tab;
+  [`explore`, `requests`, `saved`].forEach(tb => {
+    const btn = document.getElementById(`ftab-${tb}`);
+    const pane = document.getElementById(`farmer-${tb}-pane`);
+    if (btn) btn.setAttribute(`aria-selected`, tb === tab ? `true` : `false`);
+    if (pane) pane.classList.toggle(`is-hidden`, tb !== tab);
+  });
+  if (tab === `explore` && mainMap) setTimeout(() => mainMap.invalidateSize(), 80);
+  if (tab === `requests`) renderFarmerRequests();
+  if (tab === `saved`) renderFarmerSaved();
+}
+
+function toggleMapListFocus() {
+  APP.mapOnly = !APP.mapOnly;
+  const grid = document.getElementById(`listings-grid`);
+  const lbl = document.getElementById(`view-mode-label`);
+  if (grid) grid.classList.toggle(`is-hidden`, APP.mapOnly);
+  if (lbl) lbl.textContent = APP.mapOnly ? t(`toggleGridFocus`) : t(`toggleMapOnly`);
+  if (mainMap) setTimeout(() => mainMap.invalidateSize(), 80);
+}
+
+function toggleMobileFilters() {
+  const panel = document.getElementById(`filter-panel`);
+  if (panel) panel.classList.toggle(`is-mobile-open`);
+}
+
+function scrollToBrowse() {
+  switchRole(`farmer`);
+  setFarmerTab(`explore`);
+  const el = document.getElementById(`browse-anchor`);
+  if (el) el.scrollIntoView({ behavior: `smooth` });
+}
+
+function mobileGo(dest) {
+  document.querySelectorAll(`.mobile-nav-btn`).forEach(b => b.classList.remove(`is-active`));
+  const btn = document.getElementById(`mnav-${dest}`);
+  if (btn) btn.classList.add(`is-active`);
+  if (dest === `explore`) { switchRole(`farmer`); setFarmerTab(`explore`); }
+  else if (dest === `requests`) { switchRole(`farmer`); setFarmerTab(`requests`); }
+  else if (dest === `owner`) { switchRole(`owner`); }
+  else if (dest === `admin`) { switchRole(`admin`); }
+}
+
+function toggleLanguage() {
+  APP.lang = APP.lang === `en` ? `si` : `en`;
+  applyTranslations();
+  applyFilters();
+  renderFarmerRequests();
+  renderFarmerSaved();
+  if (APP.role === `owner`) renderOwnerDashboard();
+  if (APP.role === `admin`) renderAdminDashboard();
+  updateCompareTray();
+  persistState();
+  refreshLucide();
+}
+
+/* ================= FAVORITES, COMPARE & DETAIL MODAL ================= */
+function toggleFavorite(landId) {
+  const idx = APP.favorites.indexOf(landId);
+  if (idx >= 0) APP.favorites.splice(idx, 1);
+  else APP.favorites.push(landId);
+  updateFarmerCounts();
+  applyFilters();
+  if (APP.farmerTab === `saved`) renderFarmerSaved();
+  persistState();
+}
+
+function updateFarmerCounts() {
+  const favEl = document.getElementById(`farmer-fav-count`);
+  const reqEl = document.getElementById(`farmer-req-count`);
+  if (favEl) favEl.textContent = APP.favorites.length;
+  if (reqEl) reqEl.textContent = APP.requests.length;
+}
+
+function toggleCompare(landId, checked) {
+  if (checked) {
+    if (APP.compareIds.length >= 3) {
+      APP.compareIds.shift();
+    }
+    if (!APP.compareIds.includes(landId)) APP.compareIds.push(landId);
+  } else {
+    APP.compareIds = APP.compareIds.filter(id => id !== landId);
+  }
+  updateCompareTray();
+  applyFilters();
+}
+
+function updateCompareTray() {
+  const tray = document.getElementById(`compare-tray`);
+  const lbl = document.getElementById(`compare-tray-label`);
+  if (!tray || !lbl) return;
+  tray.classList.toggle(`is-open`, APP.compareIds.length >= 2);
+  lbl.textContent = `${APP.compareIds.length} / 3 ${APP.lang === `si` ? `තෝරාගෙන ඇත` : `lands selected`}`;
+}
+
+function clearCompare() {
+  APP.compareIds = [];
+  updateCompareTray();
+  applyFilters();
+}
+
+function openCompareModal() {
+  const modal = document.getElementById(`compare-modal`);
+  const wrap = document.getElementById(`compare-table-wrap`);
+  if (!modal || !wrap) return;
+  const prefs = getFilterPrefs();
+  const items = APP.compareIds.map(id => APP.lands.find(l => l.id === id)).filter(Boolean);
+  if (items.length === 0) return;
+
+  const scores = items.map(l => computeMatchScore(l, prefs));
+  const bestScore = Math.max(...scores);
+  const maxSize = Math.max(...items.map(l => l.sizeAcres));
+  const minRentPerAcre = Math.min(...items.map(l => l.priceMonthly / l.sizeAcres));
+  const dict = I18N[APP.lang];
+
+  wrap.innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>${dict.attrShort}</th>
+          ${items.map(l => `<th>${landTitle(l)}</th>`).join(``)}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>${dict.colPhoto}</strong></td>
+          ${items.map(l => `<td><img src="${getLandPhoto(l)}" alt="${landTitle(l)}" style="width:150px;height:96px;object-fit:cover;border-radius:8px;display:block"><small>${dict.illustrativePhoto}</small></td>`).join(``)}
+        </tr>
+        <tr>
+          <td><strong>${dict.matchLabel} %</strong></td>
+          ${items.map((l, i) => `<td class="${scores[i] === bestScore ? `best-cell` : ``}">${scores[i]}%</td>`).join(``)}
+        </tr>
+        <tr>
+          <td><strong>${dict.lblDistrict}</strong></td>
+          ${items.map(l => `<td>${districtLabel(l.district)}</td>`).join(``)}
+        </tr>
+        <tr>
+          <td><strong>${dict.lblSize}</strong></td>
+          ${items.map(l => `<td class="${l.sizeAcres === maxSize ? `best-cell` : ``}">${l.sizeAcres} ${dict.acresShort}</td>`).join(``)}
+        </tr>
+        <tr>
+          <td><strong>${dict.lblPriceLkr}</strong></td>
+          ${items.map(l => {
+            const perAcre = Math.round(l.priceMonthly / l.sizeAcres);
+            const isBest = Math.abs(l.priceMonthly / l.sizeAcres - minRentPerAcre) < 1;
+            return `<td class="${isBest ? `best-cell` : ``}">LKR ${l.priceMonthly.toLocaleString()} ${dict.perMonth}<br><small>(LKR ${perAcre.toLocaleString()}/ac)</small></td>`;
+          }).join(``)}
+        </tr>
+        <tr>
+          <td><strong>${dict.lblWater}</strong></td>
+          ${items.map(l => `<td>${dict.waterNames[l.water]}</td>`).join(``)}
+        </tr>
+        <tr>
+          <td><strong>${dict.lblSoil}</strong></td>
+          ${items.map(l => `<td>${dict.soilNames[l.soil] || l.soil}</td>`).join(``)}
+        </tr>
+        <tr>
+          <td><strong>${dict.lblSuitableCrops}</strong></td>
+          ${items.map(l => `<td>${l.crops}</td>`).join(``)}
+        </tr>
+      </tbody>
+    </table>
+  `;
+  modal.classList.add(`is-open`);
+}
+
+function closeCompareModal() {
+  const modal = document.getElementById(`compare-modal`);
+  if (modal) modal.classList.remove(`is-open`);
+}
+
+function openDetailModal(landId) {
+  const land = APP.lands.find(l => l.id === landId);
+  if (!land) return;
+  APP.activeModalLandId = landId;
+  const dict = I18N[APP.lang];
+  const prefs = getFilterPrefs();
+  const score = computeMatchScore(land, prefs);
+
+  document.getElementById(`modal-district-pill`).textContent = `${districtLabel(land.district)} • ${score}% ${dict.matchLabel}`;
+  document.getElementById(`modal-land-title`).textContent = landTitle(land);
+  const gallery = getLandGallery(land);
+  document.getElementById(`modal-photo`).src = gallery[0];
+  document.getElementById(`modal-gallery-strip`).innerHTML = gallery.length > 1
+    ? gallery.map((src, i) => `<img src="${src}" alt="Preview ${i + 1}" class="thumb-sm" style="cursor:pointer" onclick="document.getElementById('modal-photo').src='${src}'">`).join(``)
+    : ``;
+
+  document.getElementById(`modal-specs-grid`).innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">${dict.lblSize} / ${dict.lblPriceLkr}</div>
+      <div class="stat-value" style="font-size:1.35rem">${land.sizeAcres} ${dict.acresShort} • LKR ${land.priceMonthly.toLocaleString()}${dict.perMonth}</div>
+      <div class="stat-sub">${dict.soilNames[land.soil] || land.soil} • ${dict.waterNames[land.water]}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">${dict.lblSuitableCrops} &amp; Facilities</div>
+      <div style="font-weight:700;margin-top:4px">${land.crops}</div>
+      <div class="stat-sub">${land.road ? dict.lblRoadAccess : `Footpath`} • ${land.elec ? dict.lblElectricity : `No Grid`} • ${land.ownerName}</div>
+    </div>
+  `;
+
+  const fb = document.getElementById(`req-feedback`);
+  const submitBtn = document.getElementById(`req-submit-btn`);
+  if (fb) { fb.className = `inline-alert is-hidden`; fb.textContent = ``; }
+  if (land.status === `leased`) {
+    if (submitBtn) submitBtn.disabled = true;
+    if (fb) {
+      fb.className = `inline-alert is-error`;
+      fb.textContent = dict.leasedDisabledMsg;
+    }
+  } else {
+    if (submitBtn) submitBtn.disabled = false;
+  }
+
+  document.getElementById(`detail-modal`).classList.add(`is-open`);
+}
+
+function closeDetailModal() {
+  const m = document.getElementById(`detail-modal`);
+  if (m) m.classList.remove(`is-open`);
+}
+
+function submitLeaseRequest() {
+  const land = APP.lands.find(l => l.id === APP.activeModalLandId);
+  if (!land || land.status === `leased`) return;
+  const cropEl = document.getElementById(`req-crop`);
+  const durEl = document.getElementById(`req-duration`);
+  const noteEl = document.getElementById(`req-note`);
+  const fb = document.getElementById(`req-feedback`);
+  const crop = cropEl ? cropEl.value.trim() : ``;
+  if (!crop) {
+    if (fb) { fb.className = `inline-alert is-error`; fb.textContent = t(`reqMissingMsg`); }
+    return;
+  }
+  APP.requests.unshift({
+    id: `R` + Date.now().toString().slice(-4),
+    landId: land.id,
+    farmerName: `K.M. Ruwan Kumara`,
+    duration: durEl ? durEl.value : `12 Months`,
+    crop: crop,
+    note: noteEl ? noteEl.value.trim() : ``,
+    status: `pending`,
+    createdAt: `2026-11-24`
+  });
+  if (cropEl) cropEl.value = ``;
+  if (noteEl) noteEl.value = ``;
+  if (fb) { fb.className = `inline-alert is-success`; fb.textContent = t(`reqSentMsg`); }
+  updateFarmerCounts();
+  updateTopStats();
+  persistState();
+}
+
+function renderFarmerRequests() {
+  const container = document.getElementById(`farmer-requests-list`);
+  if (!container) return;
+  const dict = I18N[APP.lang];
+  if (APP.requests.length === 0) {
+    container.innerHTML = `<p>${dict.noRequests}</p>`;
+    return;
+  }
+  container.innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>${dict.colPhoto}</th><th>${dict.colLand}</th><th>${dict.colDistrict}</th><th>${dict.colCropDuration}</th><th>${dict.colStatus}</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${APP.requests.map(r => {
+          const land = APP.lands.find(l => l.id === r.landId);
+          if (!land) return ``;
+          const stClass = r.status === `accepted` ? `status-accepted` : r.status === `rejected` ? `status-rejected` : `status-pending`;
+          const stLabel = r.status === `accepted` ? dict.acceptedTag : r.status === `rejected` ? dict.rejectedTag : dict.pendingTag;
+          return `
+            <tr>
+              <td><img src="${getLandPhoto(land)}" alt="${landTitle(land)}" class="thumb-sm"></td>
+              <td><strong>${landTitle(land)}</strong><br><small>${r.createdAt}</small></td>
+              <td>${districtLabel(land.district)}</td>
+              <td>${r.crop}<br><small>${r.duration}</small></td>
+              <td><span class="status-badge ${stClass}">${stLabel}</span></td>
+            </tr>
+          `;
+        }).join(``)}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderFarmerSaved() {
+  const grid = document.getElementById(`farmer-saved-grid`);
+  if (!grid) return;
+  const prefs = getFilterPrefs();
+  const favLands = APP.lands.filter(l => APP.favorites.includes(l.id) && (l.status === `approved` || l.status === `leased`));
+  if (favLands.length === 0) {
+    grid.innerHTML = `<p>${t(`noSaved`)}</p>`;
+    return;
+  }
+  grid.innerHTML = favLands.map(l => buildLandCardHtml(l, computeMatchScore(l, prefs), false)).join(``);
+  refreshLucide();
+}
+
+/* ================= LANDOWNER DASHBOARD & WIZARD ================= */
+function renderOwnerDashboard() {
+  const ownerLands = APP.lands.filter(l => l.ownerId === `owner1`);
+  const grid = document.getElementById(`owner-lands-grid`);
+  if (grid) {
+    grid.innerHTML = ownerLands.map(l => buildLandCardHtml(l, 100, true)).join(``);
+  }
+  const ownerIds = new Set(ownerLands.map(l => l.id));
+  const incoming = APP.requests.filter(r => ownerIds.has(r.landId));
+  const reqBox = document.getElementById(`owner-requests-list`);
+  const dict = I18N[APP.lang];
+  if (reqBox) {
+    if (incoming.length === 0) {
+      reqBox.innerHTML = `<p>${dict.noRequests}</p>`;
+    } else {
+      reqBox.innerHTML = `
+        <table class="data-table">
+          <thead>
+            <tr><th>${dict.colLand}</th><th>${dict.colFarmer}</th><th>${dict.colCropDuration}</th><th>${dict.colStatus}</th><th>${dict.colAction}</th></tr>
+          </thead>
+          <tbody>
+            ${incoming.map(r => {
+              const land = APP.lands.find(l => l.id === r.landId);
+              const stClass = r.status === `accepted` ? `status-accepted` : r.status === `rejected` ? `status-rejected` : `status-pending`;
+              const stLabel = r.status === `accepted` ? dict.acceptedTag : r.status === `rejected` ? dict.rejectedTag : dict.pendingTag;
+              return `
+                <tr>
+                  <td><strong>${land ? landTitle(land) : r.landId}</strong></td>
+                  <td>${r.farmerName}<br><small>${r.note || ``}</small></td>
+                  <td>${r.crop}<br><small>${r.duration}</small></td>
+                  <td><span class="status-badge ${stClass}">${stLabel}</span></td>
+                  <td>
+                    ${r.status === `pending` ? `
+                      <div style="display:flex;gap:6px;flex-wrap:wrap">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="ownerDecideRequest(this, '${r.id}', 'accepted')">${dict.acceptBtn}</button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="ownerDecideRequest(this, '${r.id}', 'rejected')">${dict.rejectBtn}</button>
+                      </div>
+                    ` : `—`}
+                  </td>
+                </tr>
+              `;
+            }).join(``)}
+          </tbody>
+        </table>
+      `;
+    }
+  }
+  refreshLucide();
+}
+
+function ownerDecideRequest(btn, reqId, decision) {
+  if (btn.dataset.armed !== `true`) {
+    btn.dataset.armed = `true`;
+    btn.textContent = t(`confirmAgain`);
+    return;
+  }
+  const req = APP.requests.find(r => r.id === reqId);
+  if (!req) return;
+  req.status = decision;
+  if (decision === `accepted`) {
+    const land = APP.lands.find(l => l.id === req.landId);
+    if (land) land.status = `leased`;
+  }
+  renderOwnerDashboard();
+  updateTopStats();
+  persistState();
+}
+
+function openWizard() {
+  const w = document.getElementById(`add-land-wizard`);
+  if (w) w.classList.remove(`is-hidden`);
+  goWizardStep(1);
+}
+
+function closeWizard() {
+  const w = document.getElementById(`add-land-wizard`);
+  if (w) w.classList.add(`is-hidden`);
+}
+
+function goWizardStep(step) {
+  if (step === 2) {
+    const title = document.getElementById(`w-title`).value.trim();
+    const err = document.getElementById(`wiz-err-1`);
+    if (!title) {
+      if (err) { err.classList.remove(`is-hidden`); err.textContent = `Please enter a listing title before continuing.`; }
+      return;
+    }
+    if (err) err.classList.add(`is-hidden`);
+  }
+  APP.wizardStep = step;
+  [1, 2, 3].forEach(s => {
+    const el = document.getElementById(`wizard-step-${s}`);
+    const pill = document.getElementById(`wstep-pill-${s}`);
+    if (el) el.classList.toggle(`is-hidden`, s !== step);
+    if (pill) pill.classList.toggle(`is-active`, s === step);
+  });
+  if (step === 2) {
+    setTimeout(initPickerMap, 80);
+  }
+}
+
+function initPickerMap() {
+  const el = document.getElementById(`picker-map`);
+  if (!el) return;
+  if (!pickerMap) {
+    pickerMap = L.map(`picker-map`, {
+      center: [APP.wizardCoords.lat, APP.wizardCoords.lng],
+      zoom: 7,
+      minZoom: 7,
+      maxZoom: 18
+    });
+    L.geoJSON(SL_OUTLINE_GEO, {
+      style: { fillColor: `#ece5d3`, fillOpacity: 1, color: `#6e856d`, weight: 2 }
+    }).addTo(pickerMap);
+    L.geoJSON(SL_RIVERS_GEO, {
+      style: { color: `#5b94b5`, weight: 2, opacity: 0.7 }
+    }).addTo(pickerMap);
+
+    pickerMarker = L.circleMarker([APP.wizardCoords.lat, APP.wizardCoords.lng], {
+      radius: 9, color: `#ffffff`, weight: 2.5, fillColor: `#2e7d32`, fillOpacity: 1
+    }).addTo(pickerMap);
+
+    pickerMap.on(`click`, function(e) {
+      setWizardPin(e.latlng.lat, e.latlng.lng);
+    });
+  }
+  pickerMap.invalidateSize();
+}
+
+function setWizardPin(lat, lng) {
+  APP.wizardCoords = { lat: Number(lat.toFixed(4)), lng: Number(lng.toFixed(4)) };
+  if (pickerMarker) pickerMarker.setLatLng([APP.wizardCoords.lat, APP.wizardCoords.lng]);
+  if (pickerMap) pickerMap.flyTo([APP.wizardCoords.lat, APP.wizardCoords.lng], 10);
+  const ro = document.getElementById(`w-coords-readout`);
+  if (ro) ro.textContent = `${APP.wizardCoords.lat}° N, ${APP.wizardCoords.lng}° E`;
+}
+
+function captureGPS() {
+  const msg = document.getElementById(`wiz-gps-msg`);
+  if (!navigator.geolocation) {
+    if (msg) { msg.className = `inline-alert is-warn`; msg.textContent = `Geolocation unavailable here — click on the map to drop your pin.`; }
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      setWizardPin(pos.coords.latitude, pos.coords.longitude);
+      if (msg) { msg.className = `inline-alert is-success`; msg.textContent = `GPS coordinates captured successfully!`; }
+    },
+    () => {
+      const distName = document.getElementById(`w-district`).value;
+      const dist = DISTRICTS.find(d => d.id === distName) || DISTRICTS[0];
+      setWizardPin(dist.lat, dist.lng);
+      if (msg) { msg.className = `inline-alert is-warn`; msg.textContent = `Browser GPS blocked in preview — centered on ${dist.id}. Click map to refine pin.`; }
+    },
+    { timeout: 5000 }
+  );
+}
+
+function handlePhotoFiles(files) {
+  if (!files || files.length === 0) return;
+  Array.from(files).slice(0, 4).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const img = new Image();
+      img.onload = function() {
+        const maxW = 800;
+        const scale = img.width > maxW ? maxW / img.width : 1;
+        const c = document.createElement(`canvas`);
+        c.width = Math.round(img.width * scale);
+        c.height = Math.round(img.height * scale);
+        const ctx = c.getContext(`2d`);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        const compressed = c.toDataURL(`image/jpeg`, 0.7);
+        APP.wizardPhotos.push(compressed);
+        renderWizardPreviews();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderWizardPreviews() {
+  const wrap = document.getElementById(`w-photo-previews`);
+  if (!wrap) return;
+  wrap.innerHTML = APP.wizardPhotos.map((src, idx) => `
+    <div class="preview-item">
+      <img src="${src}" alt="Uploaded preview ${idx + 1}">
+      <button type="button" class="preview-remove" aria-label="Remove photo" onclick="removeWizardPhoto(${idx})">×</button>
+      ${idx === 0 ? `<span class="cover-tag">Cover</span>` : ``}
+    </div>
+  `).join(``);
+}
+
+function removeWizardPhoto(idx) {
+  APP.wizardPhotos.splice(idx, 1);
+  renderWizardPreviews();
+}
+
+function submitNewLand() {
+  const title = document.getElementById(`w-title`).value.trim();
+  const district = document.getElementById(`w-district`).value;
+  const rawSize = parseFloat(document.getElementById(`w-size`).value) || 2;
+  const unit = document.getElementById(`w-unit`).value;
+  const sizeAcres = unit === `perches` ? Number((rawSize / 160).toFixed(2)) : rawSize;
+  const rawPrice = parseInt(document.getElementById(`w-price`).value, 10) || 40000;
+  const cycle = document.getElementById(`w-cycle`).value;
+  const priceMonthly = cycle === `annual` ? Math.round(rawPrice / 12) : rawPrice;
+  const soil = document.getElementById(`w-soil`).value;
+  const category = document.getElementById(`w-category`).value;
+  const crops = document.getElementById(`w-crops`).value.trim() || `Mixed Seasonal Crops`;
+  const water = document.getElementById(`w-water`).value;
+  const road = document.getElementById(`w-road`).checked;
+  const elec = document.getElementById(`w-elec`).checked;
+
+  const fallbackKeys = { paddy: `paddy_1`, tea: `tea_1`, coconut: `coconut_1`, vegetable: `veg_1` };
+  const id = `L` + Date.now().toString().slice(-4);
+  const hasCustomPhoto = APP.wizardPhotos.length > 0;
+  if (hasCustomPhoto) {
+    APP.uploadedPhotoStore[id] = APP.wizardPhotos.slice();
+  }
+
+  APP.lands.unshift({
+    id: id,
+    title: title,
+    titleSi: title,
+    district: district,
+    category: category,
+    sizeAcres: sizeAcres,
+    priceMonthly: priceMonthly,
+    cycle: cycle,
+    water: water,
+    road: road,
+    elec: elec,
+    soil: soil,
+    crops: crops,
+    lat: APP.wizardCoords.lat,
+    lng: APP.wizardCoords.lng,
+    photoKey: fallbackKeys[category] || `paddy_1`,
+    hasCustomPhoto: hasCustomPhoto,
+    ownerId: `owner1`,
+    ownerName: `Bandara Herath`,
+    status: `pending`
+  });
+
+  APP.wizardPhotos = [];
+  renderWizardPreviews();
+  document.getElementById(`w-title`).value = ``;
+  closeWizard();
+  renderOwnerDashboard();
+  updateTopStats();
+  persistState();
+}
+
+/* ================= ADMIN CONSOLE & CHART.JS ================= */
+function renderAdminDashboard() {
+  const dict = I18N[APP.lang];
+  const pending = APP.lands.filter(l => l.status === `pending`);
+  const approved = APP.lands.filter(l => l.status === `approved`);
+  const leased = APP.lands.filter(l => l.status === `leased`);
+  const ownersCount = new Set(APP.lands.map(l => l.ownerName)).size;
+
+  const metricsEl = document.getElementById(`admin-metrics`);
+  if (metricsEl) {
+    metricsEl.innerHTML = `
+      <div class="stat-card is-leaf-highlight"><div class="stat-label">${dict.admOwners}</div><div class="stat-value">${ownersCount}</div><div class="stat-sub">${dict.admOwnersSub}</div></div>
+      <div class="stat-card"><div class="stat-label">${dict.admFarmers}</div><div class="stat-value">18</div><div class="stat-sub">${dict.admFarmersSub}</div></div>
+      <div class="stat-card"><div class="stat-label">${dict.admPending}</div><div class="stat-value">${pending.length}</div><div class="stat-sub">${dict.admPendingSub}</div></div>
+      <div class="stat-card"><div class="stat-label">${dict.admLive}</div><div class="stat-value">${approved.length} / ${leased.length}</div><div class="stat-sub">${dict.admLiveSub}</div></div>
+    `;
+  }
+
+  const pendingEl = document.getElementById(`admin-pending-list`);
+  if (pendingEl) {
+    if (pending.length === 0) {
+      pendingEl.innerHTML = `<p>${dict.noPending}</p>`;
+    } else {
+      pendingEl.innerHTML = `
+        <table class="data-table">
+          <thead><tr><th>${dict.colPhoto}</th><th>${dict.colLand}</th><th>${dict.colDistrict}</th><th>${dict.colOwner}</th><th>${dict.colSizeRent}</th><th>${dict.colAction}</th></tr></thead>
+          <tbody>
+            ${pending.map(l => `
+              <tr>
+                <td><img src="${getLandPhoto(l)}" alt="${landTitle(l)}" class="thumb-sm"></td>
+                <td><strong>${landTitle(l)}</strong></td>
+                <td>${districtLabel(l.district)}</td>
+                <td>${l.ownerName}</td>
+                <td>${l.sizeAcres} ac • LKR ${l.priceMonthly.toLocaleString()}</td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="adminApprove('${l.id}')">${dict.approveBtn}</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="adminRemove(this, '${l.id}')">${dict.removeBtn}</button>
+                  </div>
+                </td>
+              </tr>
+            `).join(``)}
+          </tbody>
+        </table>
+      `;
+    }
+  }
+
+  const allEl = document.getElementById(`admin-all-table`);
+  if (allEl) {
+    allEl.innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>${dict.colPhoto}</th><th>${dict.colLand}</th><th>${dict.colDistrict}</th><th>${dict.colStatus}</th><th>${dict.colRent}</th><th>${dict.colAction}</th></tr></thead>
+        <tbody>
+          ${APP.lands.map(l => {
+            const stClass = l.status === `approved` ? `status-approved` : l.status === `pending` ? `status-pending` : `status-leased`;
+            const stLabel = l.status === `approved` ? dict.approvedTag : l.status === `pending` ? dict.pendingTag : dict.leasedTag;
+            return `
+              <tr>
+                <td><img src="${getLandPhoto(l)}" alt="${landTitle(l)}" class="thumb-sm"></td>
+                <td><strong>${landTitle(l)}</strong></td>
+                <td>${districtLabel(l.district)}</td>
+                <td><span class="status-badge ${stClass}">${stLabel}</span></td>
+                <td>LKR ${l.priceMonthly.toLocaleString()}</td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="adminRemove(this, '${l.id}')">${dict.removeBtn}</button></td>
+              </tr>
+            `;
+          }).join(``)}
+        </tbody>
+      </table>
+    `;
+  }
+  renderAdminCharts();
+}
+
+function adminApprove(landId) {
+  const l = APP.lands.find(x => x.id === landId);
+  if (l) l.status = `approved`;
+  renderAdminDashboard();
+  updateTopStats();
+  persistState();
+}
+
+function adminRemove(btn, landId) {
+  if (btn.dataset.armed !== `true`) {
+    btn.dataset.armed = `true`;
+    btn.textContent = t(`confirmAgain`);
+    return;
+  }
+  APP.lands = APP.lands.filter(x => x.id !== landId);
+  renderAdminDashboard();
+  updateTopStats();
+  persistState();
+}
+
+function handleResetDemo(btn) {
+  if (btn.dataset.armed !== `true`) {
+    btn.dataset.armed = `true`;
+    btn.textContent = t(`confirmAgain`);
+    return;
+  }
+  btn.dataset.armed = `false`;
+  btn.innerHTML = `<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i><span data-i18n="resetDemoBtn">${t(`resetDemoBtn`)}</span>`;
+  cloneDefaults();
+  applyTranslations();
+  applyFilters();
+  renderAdminDashboard();
+  updateTopStats();
+  updateFarmerCounts();
+  persistState();
+  refreshLucide();
+}
+
+function renderAdminCharts() {
+  if (typeof Chart === `undefined`) return;
+  const distCounts = {};
+  APP.lands.forEach(l => {
+    distCounts[l.district] = (distCounts[l.district] || 0) + 1;
+  });
+  const distLabels = Object.keys(distCounts);
+  const distVals = distLabels.map(k => distCounts[k]);
+
+  const c1 = document.getElementById(`chart-districts`);
+  if (c1) {
+    if (APP.districtChart) APP.districtChart.destroy();
+    APP.districtChart = new Chart(c1, {
+      type: `bar`,
+      data: {
+        labels: distLabels,
+        datasets: [{
+          label: `Land Listings`,
+          data: distVals,
+          backgroundColor: `#2e7d32`,
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+  }
+
+  const reqCounts = { pending: 0, accepted: 0, rejected: 0 };
+  APP.requests.forEach(r => { if (reqCounts[r.status] !== undefined) reqCounts[r.status]++; });
+
+  const c2 = document.getElementById(`chart-requests`);
+  if (c2) {
+    if (APP.requestChart) APP.requestChart.destroy();
+    APP.requestChart = new Chart(c2, {
+      type: `doughnut`,
+      data: {
+        labels: [t(`pendingTag`), t(`acceptedTag`), t(`rejectedTag`)],
+        datasets: [{
+          data: [reqCounts.pending, reqCounts.accepted, reqCounts.rejected],
+          backgroundColor: [`#c87414`, `#2e7d32`, `#b83230`]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  }
+}
+
+function refreshLucide() {
+  if (window.lucide && typeof window.lucide.createIcons === `function`) {
+    window.lucide.createIcons();
+  }
+}
+
+/* ================= BOOT SEQUENCE ================= */
+async function bootApp() {
+  initPhotoLibrary();
+  const heroEl = document.getElementById(`hero-photo-el`);
+  if (heroEl) heroEl.src = PHOTO_CACHE.hero_paddy;
+
+  await loadSavedState();
+  renderSeasonStrip();
+  applyTranslations();
+  initMainMap();
+  updateTopStats();
+  updateFarmerCounts();
+  switchRole(APP.role);
+  refreshLucide();
+
+  if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+    window.notebookAppApi.notifyAppReady();
+  }
+}
+
+document.addEventListener(`DOMContentLoaded`, bootApp);
+</script>
+</body>
+</html>
